@@ -1,4 +1,6 @@
 import $ from 'jquery';
+import "jquery/dist/jquery.min";
+import "jquery-validation/dist/jquery.validate.min";
 
 $(document).ready(function() {
 
@@ -67,4 +69,39 @@ $(document).ready(function() {
         return false;
     })
 
+});
+
+$(document).ready(function() {
+    $("form").validate({
+        rules: {
+            last_name: {
+                required: true
+            },
+            address: {
+                required: true
+            },
+            phone_number: {
+                required: true,
+                number: true
+            },
+            email: {
+                email: true
+            }
+        },
+        messages: {
+            last_name: {
+                required: "Vui lòng nhập tên của bạn"
+            },
+            address: {
+                required: "Vui lòng nhập địa chỉ"
+            },
+            phone_number: {
+                required: "Vui lòng nhập số điện thoại",
+                number: "Số điện thoại chỉ cho phép nhập số"
+            },
+            email: {
+                email: "Email chưa đúng định dạng"
+            }
+        }
+    })
 });

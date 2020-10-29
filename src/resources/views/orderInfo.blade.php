@@ -5,69 +5,79 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" media="screen" href="/css/app.css" />
+        <style>
+            .success{border: solid 1px blue;}
+            .error {border:solid 1px red;}
+        </style>
         <script src="/js/app.js"></script>
+        {{-- <script src="/node_modules/jquery/dist/jquery.js"></script> --}}
+        {{-- <script src="/node_modules/jquery-validation/dist/jquery.validate.js"></script> --}}
+        {{-- <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.2/dist/jquery.validate.js"></script> --}}
     </head>
     <body>
         <div class="container-fluid">
-            <form action="{{ route('order.create') }}" method="POST">
-                @csrf
-                <div class="row">
-                    <div class="form-order col-md-9">
-                        <div class="container">
-                            @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                            @endif
-                            @if (session('alert'))
-                            <div class="alert alert-danger">
-                               {!! session('alert') !!}
-                            </div>
-                            @endif
-                            <ul id="progressbar">
-                                <li class="active" id="account">01 THÔNG TIN KHÁCH HÀNG</li>
-                                <li id="personal">02 THÔNG TIN THANH TOÁN</li>
+            {{-- @csrf --}}
+            <div class="row">
+                <div class="form-order col-md-9">
+                    <div class="container">
+                        @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
                             </ul>
-                            <fieldset>
-                                <div class="form-card">
+                        </div>
+                        @endif
+                        @if (session('alert'))
+                        <div class="alert alert-danger">
+                            {!! session('alert') !!}
+                        </div>
+                        @endif
+                        <ul id="progressbar">
+                            <li class="active" id="account">01 THÔNG TIN KHÁCH HÀNG</li>
+                            <li id="personal">02 THÔNG TIN THANH TOÁN</li>
+                        </ul>
+                        <form id="form_checkout" action="{{ route('order.payment') }}" method="POST" class="form-card">
+                            @csrf
+                                <fieldset id="fs-info">
                                     <h3>Thông tin khách hàng</h3>
                                     <div class="d-flex justify-content-between">
                                         <div class="form-info">
                                             <p>Họ</p>
-                                            <input type="text" name="first_name" value="{!! Auth::check() ? Auth::user()->first_name : '' !!}">
+                                            <input id="first-name" type="text" name="first_name" value="{!! Auth::check() ? Auth::user()->first_name : '' !!}">
                                         </div>
                                         <div class="form-info">
                                             <p>Tên (<b class="text-danger">*</b>)</p>
-                                            <input type="text" name="last_name" value="{!! Auth::check() ? Auth::user()->last_name : '' !!}">
+                                        <input id="last-name" type="text" name="last_name" value="{{ (isset($last_name)) ? $last_name : "" }}">
                                         </div>
                                     </div>
                                     <div class="address">
                                         <p>Địa chỉ (<b class="text-danger">*</b>)</p>
-                                        <input type="text" name="address" value="{!! Auth::check() ? Auth::user()->address : '' !!}">
+                                        <input id="address" type="text" name="address" value="{!! Auth::check() ? Auth::user()->address : '' !!}">
                                     </div>
                                     <div class="d-flex justify-content-between">
                                         <div class="form-info">
                                             <p>Email</p>
-                                            <input type="text" name="email" value="{!! Auth::check() ? Auth::user()->email : '' !!}">
+                                            <input id="email" type="text" name="email" value="{!! Auth::check() ? Auth::user()->email : '' !!}">
                                         </div>
                                         <div class="form-info">
                                             <p>Số điện thoại (<b class="text-danger">*</b>)</p>
-                                            <input type="text" name="phone_number" value="{!! Auth::check() ? Auth::user()->phone_number : '' !!}">
+                                            <input id="phone-number" type="text" name="phone_number" value="{!! Auth::check() ? Auth::user()->phone_number : '' !!}">
                                         </div>
                                     </div>
                                     <div class="address">
                                         <p>Ghi chú</p>
-                                        <textarea name="note" placeholder="Note...."></textarea>
+                                        <textarea name="note" id="note" placeholder="Note...."></textarea>
                                     </div>
-                                </div>
-                                <a href="/cart" class="btn-back"><b><i class="fa fa-arrow-left" aria-hidden="true"></i> Quay lại giỏ hàng</b></a>
-                                <input type="button" name="next" class="next action-button" value="Tiếp tục" />
-                            </fieldset>
-                            <fieldset>
+                                    <a href="/cart" class="btn-back"><b><i class="fa fa-arrow-left" aria-hidden="true"></i> Quay lại giỏ hàng</b></a>
+                                    <input onclick="store()" id="btn-continue" type="submit" name="next" class="action-button" value="Tiếp tục" />
+                                </fieldset>
+                            </form>
+                            
+                            {{-- <fieldset>
+                            <form id="form_checkout" action="{{ route('order.create') }}" method="POST">
                                 <div class="form-card">
                                     <h3>Phương thức thanh toán</h3>
                                     <div class="row mt-4">
@@ -99,7 +109,8 @@
                                 </div>
                                 <i class="fa fa-arrow-left icon-back" aria-hidden="true"></i><input type="button" name="previous" class="previous action-button-previous" value="Quay lại" />
                                 <button type="button" class="action-button col-12 col-md-3" data-toggle="modal" data-target="#confirmModal">Thanh toán</button>
-                            </fieldset>
+                            </fieldset> --}}
+                            
                         </div>
                     </div>
                     <div class="col-12 col-md-3 background">
@@ -154,4 +165,29 @@
             </form>
         </div>
     </body>
+
+<script>
+ function store(){
+     var inputEmail= document.getElementById("email");
+     localStorage.setItem("email", inputEmail.value);
+    }
+
+var first_name = $('#first-name').val();
+var last_name = $('#last-name').val();
+var address = $('#address').val();
+var email = $('#email').val();
+var phone_number = $('#phone-number').val();
+var note = $('#note').val();
+
+localStorage.setItem("first_name", first_name);
+localStorage.setItem("last_name", last_name);
+localStorage.setItem("address", address);
+localStorage.setItem("email", email);
+localStorage.setItem("phone_number", phone_number);
+localStorage.setItem("note", note);
+
+console.log(localStorage.getItem("email"));
+
+</script>
+
 </html>

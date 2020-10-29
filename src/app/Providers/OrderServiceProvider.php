@@ -50,6 +50,7 @@ class OrderServiceProvider extends ServiceProvider
             __DIR__ . '/../../config/order.php'           => config_path('order.php'),
             __DIR__ . '/../../resources/sass/cart.scss'   => base_path('/resources/sass/orders/cart.scss'),
             __DIR__ . '/../../resources/js/cart.js'       => base_path('/resources/js/order/cart.js'),
+            __DIR__ . '/../../resources/js/test.js'       => base_path('/resources/js/order/test.js'),
             __DIR__ . '/../../resources/js/order-info.js' => base_path('/resources/js/order/order-info.js'),
             __DIR__ . '/../../resources/sass/cart.png'    => public_path('/images/cart/cart.png'),
             __DIR__ . '/../../resources/sass/tick.png'    => public_path('/images/cart/tick.png'),

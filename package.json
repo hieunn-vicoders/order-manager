@@ -1,0 +1,27 @@
+{
+  "name": "order-manager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "jquery": "^3.5.1",
+    "jquery-validation": "^1.19.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vietanhxan/order-manager.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vietanhxan/order-manager/issues"
+  },
+  "homepage": "https://github.com/vietanhxan/order-manager#readme"
+}
