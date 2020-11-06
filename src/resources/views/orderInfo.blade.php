@@ -7,13 +7,10 @@
         <link rel="stylesheet" type="text/css" media="screen" href="/css/app.css" />
         <style>
             .success{border: solid 1px blue;}
-            .error {border:solid 1px red;}
+            .error {color: #D8000C;}
+            label{margin: 5px 0 0 3px;}
         </style>
         <script src="/js/app.js"></script>
-        {{-- <script src="/node_modules/jquery/dist/jquery.js"></script> --}}
-        {{-- <script src="/node_modules/jquery-validation/dist/jquery.validate.js"></script> --}}
-        {{-- <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.2/dist/jquery.validate.js"></script> --}}
     </head>
     <body>
         <div class="container-fluid">
@@ -72,7 +69,7 @@
                                         <textarea name="note" id="note" placeholder="Note...."></textarea>
                                     </div>
                                     <a href="/cart" class="btn-back"><b><i class="fa fa-arrow-left" aria-hidden="true"></i> Quay lại giỏ hàng</b></a>
-                                    <input onclick="store()" id="btn-continue" type="submit" name="next" class="action-button" value="Tiếp tục" />
+                                    <input id="btn-continue" type="submit" name="next" class="action-button" value="Tiếp tục" />
                                 </fieldset>
                             </form>
                             
@@ -165,29 +162,5 @@
             </form>
         </div>
     </body>
-
-<script>
- function store(){
-     var inputEmail= document.getElementById("email");
-     localStorage.setItem("email", inputEmail.value);
-    }
-
-var first_name = $('#first-name').val();
-var last_name = $('#last-name').val();
-var address = $('#address').val();
-var email = $('#email').val();
-var phone_number = $('#phone-number').val();
-var note = $('#note').val();
-
-localStorage.setItem("first_name", first_name);
-localStorage.setItem("last_name", last_name);
-localStorage.setItem("address", address);
-localStorage.setItem("email", email);
-localStorage.setItem("phone_number", phone_number);
-localStorage.setItem("note", note);
-
-console.log(localStorage.getItem("email"));
-
-</script>
 
 </html>

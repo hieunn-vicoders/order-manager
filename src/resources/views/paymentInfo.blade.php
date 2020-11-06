@@ -1,8 +1,3 @@
-
-{{-- @php
-    $session = $_SESSION["last_name"];
-
-@endphp --}}
 <!DOCTYPE html>
 <html>
     <head>
