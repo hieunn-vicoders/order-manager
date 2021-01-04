@@ -10,4 +10,8 @@ class OrderMail extends Model
         'email',
         'status',
     ];
+    public function ableToUse($user)
+    {
+        return true;
+    }
 }
