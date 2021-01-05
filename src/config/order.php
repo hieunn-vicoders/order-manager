@@ -30,5 +30,5 @@ return [
             'except'     => [],
         ],
     ],
-
+    'test_mode' => false
 ];

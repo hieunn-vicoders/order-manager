@@ -41,16 +41,15 @@ class OrderController extends ApiController
 
     public function show(Request $request, $id)
     {
-        $query = $this->entity;
+        $order = $this->repository->findById($id);
 
-        $query = $this->applyConstraintsFromRequest($query, $request);
-        $query = $this->applySearchFromRequest($query, [], $request);
-        $query = $this->applyOrderByFromRequest($query, $request);
+        if ($request->has('includes')) {
+            $transformer = new $this->transformer(explode(',', $request->get('includes')));
+        } else {
+            $transformer = new $this->transformer;
+        }
 
-        $per_page = $request->has('per_page') ? (int) $request->get('per_page') : 15;
-        $order    = $query->where('user_id', $id)->paginate($per_page);
-
-        return $this->response->paginator($order, new $this->transformer);
+        return $this->response->item($order, $transformer);
     }
 
     public function store(Request $request)
@@ -63,7 +62,7 @@ class OrderController extends ApiController
             unset($data['order_items']);
         }
 
-        $order = $this->repository->where($data)->first();
+        $order = $this->entity->where($data)->first();
 
         if ($order) {
             throw new \Exception("Order này đã tồn tại", 1);
@@ -160,6 +159,8 @@ class OrderController extends ApiController
 
             $order->total = $total;
             $order->save();
+        } else {
+            throw new \Exception("Không thể tạo đơn hàng không có sản phẩm nào !", 1);
         }
 
         $this->entity->sendMailOrder($order);
