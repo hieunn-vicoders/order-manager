@@ -22,7 +22,11 @@
         }
     },
     "require": {
+<<<<<<< HEAD
         "webpress/core": "^0.1",
+=======
+        "webpress/core": "0.1.0",
+>>>>>>> 754ee8bdf8138b8946d7c780d06d2a5d648d05c5
         "cviebrock/eloquent-sluggable": "^7.0.1",
         "webpress/view-model": "^0.0.6",
         "webpress/product-manager": "^0.0.16",
