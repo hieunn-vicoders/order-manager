@@ -25,9 +25,9 @@
         "webpress/core": "^0.1",
         "cviebrock/eloquent-sluggable": "^7.0.1",
         "webpress/view-model": "^0.0.6",
-        "webpress/product-manager": "^0.0.15",
+        "webpress/product-manager": "^0.0.16",
         "webpress/payment": "^0.0.3",
-        "webpress/user-manager": "^0.0.5",
+        "webpress/user-manager": "^0.0.6",
         "webpress/export-excel": "^0.0.2"
     },
     "require-dev": {
