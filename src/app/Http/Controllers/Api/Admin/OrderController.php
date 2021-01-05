@@ -16,7 +16,8 @@ use VCComponent\Laravel\Order\Transformers\OrderTransformer;
 use VCComponent\Laravel\Order\Validators\OrderValidator;
 use VCComponent\Laravel\Product\Entities\Product;
 use VCComponent\Laravel\Vicoders\Core\Controllers\ApiController;
-use VCComponent\Laravel\Vicoders\Core\Exceptions\PermissionDeniedException;
+use VCComponent\Laravel\Vicoders\Exceptions\PermissionDeniedException;
+use VCComponent\Laravel\Vicoders\Core\Exceptions\NotFoundException;
 
 class OrderController extends ApiController
 {
@@ -30,7 +31,7 @@ class OrderController extends ApiController
         $this->validatorOrder  = $validatorOrder;
         $this->transformer     = OrderTransformer::class;
 
-        if (config('order.auth_middleware.admin.middleware') !== '') {
+        if (!empty(config('order.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUse($user)) {
                 throw new PermissionDeniedException();
@@ -40,11 +41,6 @@ class OrderController extends ApiController
 
     public function export(Request $request)
     {
-        $user = $this->getAuthenticatedUser();
-        // if (!$this->entity->ableToViewList($user)) {
-        //     throw new PermissionDeniedException();
-        // }
-
         $this->validatorOrder->isValid($request, 'RULE_EXPORT');
 
         $data   = $request->all();
@@ -55,10 +51,16 @@ class OrderController extends ApiController
             'label'     => $request->label ? $data['label'] : 'Orders',
             'extension' => $request->extension ? $data['extension'] : 'Xlsx',
         ];
+        
         $export = new Export($args);
         $url    = $export->export();
 
-        return $this->response->array(['url' => $url]);
+        if (config('order.test_mode')) {
+            return $this->response->array(['data' => $orders]);
+        } else{
+             return $this->response->array(['url' => $url]);
+        }
+        
     }
 
     private function getReportOrders(Request $request)
@@ -73,8 +75,6 @@ class OrderController extends ApiController
             'orders.address as `Địa chỉ chi tiết`',
             'orders.total as `Tổng giá trị đơn hàng`',
             'orders.order_note as `Ghi chú`',
-            // 'orders.status as `Trạng thái đơn hàng`',
-            // '(case when status = 1 then "Đã Export"  when export_status = 0 then "Chưa Export" end) as `Trạng Thái Export`',
             'users.username as `Người tạo`',
 
         ];
@@ -106,7 +106,7 @@ class OrderController extends ApiController
         $query = $this->entity;
 
         $query = $this->applyConstraintsFromRequest($query, $request);
-        $query = $this->applySearchFromRequest($query, ['status'], $request);
+        $query = $this->applySearchFromRequest($query, ['phone_number', 'username', 'email', 'address'], $request, ['products' => ['name']]);
         $query = $this->applyOrderByFromRequest($query, $request);
 
         if ($request->has('status')) {
@@ -168,10 +168,10 @@ class OrderController extends ApiController
             unset($data['includes']);
         }
 
-        $order = $this->repositoryOrder->where($data)->first();
+        $order = $this->repositoryOrder->findWhere($data)->first();
 
         if ($order) {
-            throw new \Exception("Order này đã tồn tại", 1);
+            throw new \Exception("Order này đã tồn tại");
         }
 
         if ($request->has('order_items')) {
@@ -182,7 +182,7 @@ class OrderController extends ApiController
             $product_exists = array_values(array_diff($product_ids->toArray(), $products->pluck('id')->toArray()));
 
             if ($product_exists !== []) {
-                throw new \Exception("Sản phẩm có id = {$product_exists[0]} không tồn tại", 1);
+                throw new NotFoundException("Sản phẩm có id = {$product_exists[0]} không tồn tại");
             }
 
             foreach ($request->get('order_items') as $value) {
@@ -194,7 +194,6 @@ class OrderController extends ApiController
                     throw new \Exception("Sản phẩm {$product->name} không đủ số lượng", 1);
                 }
             }
-
             $order = $this->repositoryOrder->create($data);
 
             $total = 0;
@@ -226,7 +225,7 @@ class OrderController extends ApiController
                             }
                             $total_attributes += $total_attr;
                         } else {
-                            throw new \Exception('Thuộc tính có id = ' . $attribute_item['value_id'] . ' không tồn tại !', 1);
+                            throw new NotFoundException('Thuộc tính có id = ' . $attribute_item['value_id'] . ' không tồn tại !', 1);
                         }
                     }
                 }
@@ -269,6 +268,8 @@ class OrderController extends ApiController
             $attributes_order = collect($request->get('order_items'))->pluck('attributes');
 
             event(new AddAttributesEvent($order, $attributes_order));
+        } else {
+            throw new \Exception("Không thể tạo đơn hàng không có sản phẩm nào !", 1);
         }
 
         $this->entity->sendMailOrder($order);
@@ -278,7 +279,7 @@ class OrderController extends ApiController
         } else {
             $transformer = new $this->transformer;
         }
-
+    
         return $this->response->item($order, $transformer);
     }
 

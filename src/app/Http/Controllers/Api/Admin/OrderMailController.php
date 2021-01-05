@@ -21,7 +21,7 @@ class OrderMailController extends ApiController
         $this->validator   = $validator;
         $this->transformer = OrderMailTransformer::class;
 
-        if (config('order.auth_middleware.admin.middleware') !== '') {
+        if (!empty(config('order.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUse($user)) {
                 throw new PermissionDeniedException();

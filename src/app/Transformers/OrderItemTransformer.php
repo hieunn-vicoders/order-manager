@@ -24,7 +24,7 @@ class OrderItemTransformer extends TransformerAbstract
             'product_id' => (int) $model->product_id,
             'quantity'   => $model->quantity,
             'price'      => $model->price,
-            'cart_id'    => $model->cart_id,
+            'order_id'   => $model->order_id,
             'timestamps' => [
                 'created_at' => $model->created_at,
                 'updated_at' => $model->updated_at,

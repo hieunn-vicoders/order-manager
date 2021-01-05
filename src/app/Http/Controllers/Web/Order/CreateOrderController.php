@@ -98,8 +98,6 @@ class CreateOrderController extends BaseController
         $email_noti = OrderMail::whereStatus(1)->get();
 
         foreach ($email_noti as $email) {
-            // $notify = new MailNotify($order);
-            // Mail::to($email->email)->queue($notify->get_template('Đơn hàng mới từ webpress.vn !','mail.mail',['order',$order]));
             Mail::to($email->email)->queue(new MailNotify($order));
         }
 

@@ -29,9 +29,6 @@ class MailNotify extends Mailable
      */
     public function build()
     {
-        return $this->get_template('Đơn hàng mới từ webpress.vn !','order::mail.mail',['order',$this->order]);
-    }
-    public function get_template($subject, $view, $with) {
-        return $this->subject($subject)->view($view)->with($with);
+        return $this->subject('Webpress có đơn hàng mới!')->view('order::mail.mail');
     }
 }

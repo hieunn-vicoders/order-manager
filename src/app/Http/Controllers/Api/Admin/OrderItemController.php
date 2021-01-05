@@ -22,7 +22,7 @@ class OrderItemController extends ApiController
         $this->validator   = $validator;
         $this->transformer = OrderItemTransformer::class;
 
-        if (config('order.auth_middleware.admin.middleware') !== '') {
+        if (!empty(config('order.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUse($user)) {
                 throw new PermissionDeniedException();
@@ -36,8 +36,7 @@ class OrderItemController extends ApiController
 
         $this->validator->isValid($request, 'RULE_ADMIN_UPDATE');
 
-        $this->repository->findById($id);
-        $orderItem = $this->repository->where('id', $id)->first();
+        $orderItem =  $this->repository->findById($id);
         $product   = Product::where('id', $orderItem->product_id)->first();
         $quantity  = $request->get('quantity');
 
