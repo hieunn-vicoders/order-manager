@@ -22,7 +22,11 @@ class OrderRepositoryEloquent extends BaseRepository implements OrderRepository
      */
     public function model()
     {
-        return Order::class;
+        if (isset(config('order.models')['order'])) {
+            return config('order.models.order');
+        } else {
+            return Post::class;
+        }
     }
 
     public function getEntity()

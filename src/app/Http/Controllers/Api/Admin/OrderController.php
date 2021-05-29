@@ -16,8 +16,8 @@ use VCComponent\Laravel\Order\Transformers\OrderTransformer;
 use VCComponent\Laravel\Order\Validators\OrderValidator;
 use VCComponent\Laravel\Product\Entities\Product;
 use VCComponent\Laravel\Vicoders\Core\Controllers\ApiController;
-use VCComponent\Laravel\Vicoders\Exceptions\PermissionDeniedException;
 use VCComponent\Laravel\Vicoders\Core\Exceptions\NotFoundException;
+use VCComponent\Laravel\Vicoders\Core\Exceptions\PermissionDeniedException;
 
 class OrderController extends ApiController
 {
@@ -51,7 +51,7 @@ class OrderController extends ApiController
             'label'     => $request->label ? $data['label'] : 'Orders',
             'extension' => $request->extension ? $data['extension'] : 'Xlsx',
         ];
-        
+
         $export = new Export($args);
         $url    = $export->export();
 
@@ -60,7 +60,7 @@ class OrderController extends ApiController
         } else{
              return $this->response->array(['url' => $url]);
         }
-        
+
     }
 
     private function getReportOrders(Request $request)
@@ -279,7 +279,7 @@ class OrderController extends ApiController
         } else {
             $transformer = new $this->transformer;
         }
-    
+
         return $this->response->item($order, $transformer);
     }
 
