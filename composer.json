@@ -22,13 +22,13 @@
         }
     },
     "require": {
-        "webpress/core": "^1.4",
+        "webpress/core": "^2.1",
         "cviebrock/eloquent-sluggable": "7.0.1",
-        "webpress/view-model": "^1.4",
-        "webpress/product-manager": "^1.4",
-        "webpress/payment": "^1.4",
-        "webpress/user-manager": "^1.4",
-        "webpress/export-excel": "^1.4"
+        "webpress/view-model": "^2.1",
+        "webpress/product-manager": "^2.1",
+        "webpress/payment": "^2.1",
+        "webpress/user-manager": "^2.1",
+        "webpress/export-excel": "^2.1"
     },
     "require-dev": {
         "phpunit/phpunit": "8.5.13",
