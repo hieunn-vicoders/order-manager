@@ -53,6 +53,8 @@ class OrderServiceProvider extends ServiceProvider
             __DIR__ . '/../../resources/js/order-info.js' => base_path('/resources/js/order/order-info.js'),
             __DIR__ . '/../../resources/sass/cart.png'    => public_path('/images/cart/cart.png'),
             __DIR__ . '/../../resources/sass/tick.png'    => public_path('/images/cart/tick.png'),
+            __DIR__ . '/../../database/seeds/OrderSeeder.php'  => base_path('/database/seeds/OrderSeeder.php'),
+            __DIR__ . '/../../database/seeds/OrderItemsSeeder.php'  => base_path('/database/seeds/OrderItemsSeeder.php'),
         ]);
 
         View::composer(['order::cartIcon', 'order::cart', 'order::orderInfo'], CartComposer::class);

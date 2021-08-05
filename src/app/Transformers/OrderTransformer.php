@@ -3,7 +3,6 @@
 namespace VCComponent\Laravel\Order\Transformers;
 
 use League\Fractal\TransformerAbstract;
-use VCComponent\Laravel\Order\Entities\Order;
 use VCComponent\Laravel\Order\Entities\OrderItems;
 use VCComponent\Laravel\Order\Transformers\OrderItemTransformer;
 
@@ -18,7 +17,7 @@ class OrderTransformer extends TransformerAbstract
         $this->setDefaultIncludes($includes);
     }
 
-    public function transform(Order $model)
+    public function transform($model)
     {
         return [
             'id'             => (int) $model->id,
@@ -44,7 +43,7 @@ class OrderTransformer extends TransformerAbstract
         ];
     }
 
-    public function includeOrderItems(Order $orders)
+    public function includeOrderItems($orders)
     {
         $orderItems = $orders->orderItems;
         return $this->collection($orderItems, new OrderItemTransformer);
