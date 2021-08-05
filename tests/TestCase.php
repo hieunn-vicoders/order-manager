@@ -58,7 +58,7 @@ class TestCase extends OrchestraTestCase
         ]);
         $app['config']->set('order.namespace', 'order-management');
         $app['config']->set('order.models', [
-            'order' => \VCComponent\Laravel\Order\Models\Order::class,
+            'order' => \VCComponent\Laravel\Order\Entities\Order::class,
         ]);
         $app['config']->set('order.transformers', [
             'order' => \VCComponent\Laravel\Order\Transformers\OrderTransformer::class,
