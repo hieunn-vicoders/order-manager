@@ -29,6 +29,7 @@ class AdminOrderControllerTest extends TestCase
         array_multisort($listIds, SORT_DESC, $orders);
 
         $response = $this->call('GET', 'api/order-management/admin/orders');
+
         $response->assertStatus(200);
 
         foreach ($orders as $item) {
@@ -53,15 +54,15 @@ class AdminOrderControllerTest extends TestCase
         $product = factory(Product::class)->create();
 
         $orderItems['product_id'] = $product->id;
-        $orderItems['quantity']   = 1;
-        $data['order_items']      = [$orderItems];
+        $orderItems['quantity'] = 1;
+        $data['order_items'] = [$orderItems];
 
         $response = $this->json('POST', 'api/order-management/admin/orders', $data);
 
         $response->assertStatus(200);
         $response->assertJson(['data' => [
-            'user_id'      => $data['user_id'],
-            'email'        => $data['email'],
+            'customer_id' => $data['customer_id'],
+            'email' => $data['email'],
             'phone_number' => $data['phone_number'],
         ],
         ]);
@@ -80,9 +81,9 @@ class AdminOrderControllerTest extends TestCase
         unset($order['updated_at']);
         unset($order['created_at']);
 
-        $id           = $order->id;
+        $id = $order->id;
         $order->email = 'emailUpdate@gmail.com';
-        $data         = $order->toArray();
+        $data = $order->toArray();
 
         $response = $this->json('PUT', 'api/order-management/admin/orders/' . $id, $data);
 
@@ -127,8 +128,8 @@ class AdminOrderControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson(['data' => [
-            'user_id'      => $order['user_id'],
-            'email'        => $order['email'],
+            'customer_id' => $order['customer_id'],
+            'email' => $order['email'],
             'phone_number' => $order['phone_number'],
         ],
         ]);
@@ -140,11 +141,11 @@ class AdminOrderControllerTest extends TestCase
     public function can_change_payment_status_order_by_admin_router()
     {
         $order = factory(Order::class)->make(['payment_status' => 0]);
-        $data  = $order;
+        $data = $order;
         $order->save();
 
         $payment_status = ['payment_status' => 5];
-        $response       = $this->call('PUT', 'api/order-management/admin/orders/' . $data->id . '/payment-status', $payment_status);
+        $response = $this->call('PUT', 'api/order-management/admin/orders/' . $data->id . '/payment-status', $payment_status);
 
         $response->assertStatus(200);
         $response->assertJson(['success' => 'true']);
@@ -159,10 +160,10 @@ class AdminOrderControllerTest extends TestCase
     public function can_change_status_order_by_admin_router()
     {
         $order = factory(Order::class)->make(['status' => 0]);
-        $data  = $order;
+        $data = $order;
         $order->save();
 
-        $status   = ['status' => 5];
+        $status = ['status' => 5];
         $response = $this->call('PUT', 'api/order-management/admin/orders/' . $data->id . '/status', $status);
 
         $response->assertStatus(200);
@@ -179,17 +180,17 @@ class AdminOrderControllerTest extends TestCase
     {
         $order = factory(Order::class)->create();
 
-        $data  = [$order];
+        $data = [$order];
         $param = '?label=order&extension=xlsx';
 
         $response = $this->call('GET', 'api/order-management/admin/orders/exports' . $param);
         $response->assertStatus(200);
         $response->assertJsonCount(1, 'data');
         $response->assertJson(['data' => [[
-            "Số điện thoại"    => $order->phone_number,
-            "Email"            => $order->email,
+            "Số điện thoại" => $order->phone_number,
+            "Email" => $order->email,
             "Địa chỉ chi tiết" => $order->address,
-            "Ghi chú"          => $order->order_note,
+            "Ghi chú" => $order->order_note,
         ]]]);
     }
 }

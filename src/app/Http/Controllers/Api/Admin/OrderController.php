@@ -1,16 +1,13 @@
 <?php
 
 namespace VCComponent\Laravel\Order\Http\Controllers\Api\Admin;
-use Illuminate\Foundation\Bus\DispatchesJobs;
+
 use Illuminate\Http\Request;
-use VCComponent\Laravel\Mail\Entities\Mail;
 use Illuminate\Support\Facades\DB;
 use VCComponent\Laravel\Export\Services\Export\Export;
 use VCComponent\Laravel\Order\Entities\OrderItem;
-use VCComponent\Laravel\Order\Entities\OrderMail;
 use VCComponent\Laravel\Order\Entities\OrderProductAttribute;
 use VCComponent\Laravel\Order\Events\AddAttributesEvent;
-use VCComponent\Laravel\Order\Mail\MailNotify;
 use VCComponent\Laravel\Order\Repositories\OrderRepository;
 use VCComponent\Laravel\Order\Transformers\OrderTransformer;
 use VCComponent\Laravel\Order\Validators\OrderValidator;
@@ -27,9 +24,9 @@ class OrderController extends ApiController
     public function __construct(OrderRepository $repositoryOrder, OrderValidator $validatorOrder)
     {
         $this->repositoryOrder = $repositoryOrder;
-        $this->entity          = $repositoryOrder->getEntity();
-        $this->validatorOrder  = $validatorOrder;
-        $this->transformer     = OrderTransformer::class;
+        $this->entity = $repositoryOrder->getEntity();
+        $this->validatorOrder = $validatorOrder;
+        $this->transformer = OrderTransformer::class;
 
         if (!empty(config('order.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
@@ -43,22 +40,22 @@ class OrderController extends ApiController
     {
         $this->validatorOrder->isValid($request, 'RULE_EXPORT');
 
-        $data   = $request->all();
+        $data = $request->all();
         $orders = $this->getReportOrders($request);
 
         $args = [
-            'data'      => $orders,
-            'label'     => $request->label ? $data['label'] : 'Orders',
+            'data' => $orders,
+            'label' => $request->label ? $data['label'] : 'Orders',
             'extension' => $request->extension ? $data['extension'] : 'Xlsx',
         ];
 
         $export = new Export($args);
-        $url    = $export->export();
+        $url = $export->export();
 
         if (config('order.test_mode')) {
             return $this->response->array(['data' => $orders]);
-        } else{
-             return $this->response->array(['url' => $url]);
+        } else {
+            return $this->response->array(['url' => $url]);
         }
 
     }
@@ -75,8 +72,7 @@ class OrderController extends ApiController
             'orders.address as `Địa chỉ chi tiết`',
             'orders.total as `Tổng giá trị đơn hàng`',
             'orders.order_note as `Ghi chú`',
-            'users.username as `Người tạo`',
-
+            // 'users.username as `Người tạo`',
         ];
         $fields = implode(', ', $fields);
 
@@ -89,11 +85,11 @@ class OrderController extends ApiController
                 'status' => 'required|regex:/^(\d+\,?)*$/',
             ]);
             $status = explode(',', $request->get('status'));
-            $query  = $query->whereIn('status_id', $status);
+            $query = $query->whereIn('status_id', $status);
         }
 
-        $query = $query->leftJoin('users', function ($join) {
-            $join->on('orders.user_id', '=', 'users.id');
+        $query = $query->leftJoin('customers', function ($join) {
+            $join->on('orders.customer_id', '=', 'customers.id');
         });
 
         $products = $query->get()->toArray();
@@ -116,7 +112,7 @@ class OrderController extends ApiController
             ]);
 
             $status = explode(',', $request->get('status'));
-            $query  = $query->whereIn('status_id', $status);
+            $query = $query->whereIn('status_id', $status);
         }
 
         if ($request->has('payment_status')) {
@@ -126,11 +122,11 @@ class OrderController extends ApiController
             ]);
 
             $payment_status = explode(',', $request->get('payment_status'));
-            $query          = $query->whereIn('payment_status', $payment_status);
+            $query = $query->whereIn('payment_status', $payment_status);
         }
 
         $per_page = $request->has('per_page') ? (int) $request->get('per_page') : 15;
-        $order    = $query->paginate($per_page);
+        $order = $query->paginate($per_page);
 
         if ($request->has('includes')) {
             $transformer = new $this->transformer(explode(',', $request->get('includes')));
@@ -177,7 +173,7 @@ class OrderController extends ApiController
         if ($request->has('order_items')) {
 
             $product_ids = collect($request->get('order_items'))->pluck('product_id');
-            $products    = Product::whereIn('id', $product_ids)->get();
+            $products = Product::whereIn('id', $product_ids)->get();
 
             $product_exists = array_values(array_diff($product_ids->toArray(), $products->pluck('id')->toArray()));
 
@@ -204,7 +200,7 @@ class OrderController extends ApiController
 
                 $orderItem = OrderItem::where('product_id', $product->id)->where('order_id', $order->id)->first();
 
-                $amount_price     = $product->price;
+                $amount_price = $product->price;
                 $total_attributes = 0;
                 if (isset($value['attributes_value'])) {
                     $attribute_unique = collect($value['attributes_value'])->unique('attribute_id');
@@ -235,21 +231,21 @@ class OrderController extends ApiController
                 if ($orderItem) {
                     $orderItem->update(['quantity' => $value['quantity']]);
                 } else {
-                    $order_item             = new OrderItem;
-                    $order_item->order_id   = $order->id;
+                    $order_item = new OrderItem;
+                    $order_item->order_id = $order->id;
                     $order_item->product_id = $product->id;
-                    $order_item->price      = $amount_price;
-                    $order_item->quantity   = $value['quantity'];
+                    $order_item->price = $amount_price;
+                    $order_item->quantity = $value['quantity'];
                     $order_item->save();
                 }
 
                 if (isset($value['attributes_value'])) {
                     $attribute_unique = collect($value['attributes_value'])->unique('attribute_id');
                     foreach ($attribute_unique as $item) {
-                        $attribute_item                = new OrderProductAttribute;
+                        $attribute_item = new OrderProductAttribute;
                         $attribute_item->order_item_id = $order_item->id;
-                        $attribute_item->product_id    = $product->id;
-                        $attribute_item->value_id      = $item['value_id'];
+                        $attribute_item->product_id = $product->id;
+                        $attribute_item->value_id = $item['value_id'];
                         $attribute_item->save();
                     }
                 }
@@ -304,7 +300,7 @@ class OrderController extends ApiController
         if ($request->has('order_items')) {
 
             $product_ids = collect($request->get('order_items'))->pluck('product_id');
-            $products    = Product::whereIn('id', $product_ids)->get();
+            $products = Product::whereIn('id', $product_ids)->get();
 
             foreach ($request->get('order_items') as $value) {
                 $product = $products->first(function ($item, $key) use ($value) {
@@ -317,7 +313,7 @@ class OrderController extends ApiController
             }
 
             $orderitems = OrderItem::where('order_id', $order->id);
-            $items      = $orderitems->get();
+            $items = $orderitems->get();
 
             $items_old = [];
             foreach ($items as $item) {
@@ -333,7 +329,7 @@ class OrderController extends ApiController
                 } else {
                     $data = [
                         'product_id' => $item->product_id,
-                        'quantity'   => $item->quantity,
+                        'quantity' => $item->quantity,
                     ];
                     array_push($items_old, $data);
                 }
@@ -348,16 +344,16 @@ class OrderController extends ApiController
                     return $item->id == $value['product_id'];
                 });
 
-                $order_item             = new OrderItem;
-                $order_item->order_id   = $order->id;
+                $order_item = new OrderItem;
+                $order_item->order_id = $order->id;
                 $order_item->product_id = $product->id;
-                $order_item->price      = $product->price;
-                $order_item->quantity   = $value['quantity'];
+                $order_item->price = $product->price;
+                $order_item->quantity = $value['quantity'];
                 $order_item->save();
 
                 foreach ($items_old as $item) {
                     if ($item['product_id'] == $product->id) {
-                        $product->quantity      = $product->quantity + $item['quantity'] - $value['quantity'];
+                        $product->quantity = $product->quantity + $item['quantity'] - $value['quantity'];
                         $product->sold_quantity = $product->sold_quantity - $item['quantity'] + $value['quantity'];
                         $product->save();
                     }

@@ -12,7 +12,7 @@ class Order extends Model
     use Helpers;
 
     protected $fillable = [
-        'user_id',
+        'customer_id',
         'phone_number',
         'username',
         'email',
