@@ -17,7 +17,7 @@ class FrontendOrderControllerTest extends TestCase
      */
     public function can_get_order_list_of_user_by_front_end_router()
     {
-        $order = factory(Order::class)->make(['user_id' => 2 ]);
+        $order = factory(Order::class)->make(['customer_id' => 2]);
 
         $data = [$order->toArray()];
         $order->save();
@@ -33,7 +33,7 @@ class FrontendOrderControllerTest extends TestCase
         $response->assertJson(['data' => $data]);
     }
 
-     /**
+    /**
      * @test
      */
     public function can_create_order_by_front_end_router()
@@ -50,15 +50,15 @@ class FrontendOrderControllerTest extends TestCase
         $product = factory(Product::class)->create();
 
         $orderItems['product_id'] = $product->id;
-        $orderItems['quantity']   = 1;
-        $data['order_items']      = [$orderItems];
+        $orderItems['quantity'] = 1;
+        $data['order_items'] = [$orderItems];
 
         $response = $this->json('POST', 'api/order-management/orders', $data);
 
         $response->assertStatus(200);
         $response->assertJson(['data' => [
-            'user_id'      => $data['user_id'],
-            'email'        => $data['email'],
+            'customer_id' => $data['customer_id'],
+            'email' => $data['email'],
             'phone_number' => $data['phone_number'],
         ],
         ]);
@@ -78,8 +78,8 @@ class FrontendOrderControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson(['data' => [
-            'user_id'      => $order['user_id'],
-            'email'        => $order['email'],
+            'customer_id' => $order['customer_id'],
+            'email' => $order['email'],
             'phone_number' => $order['phone_number'],
         ],
         ]);

@@ -6,9 +6,10 @@ use Cviebrock\EloquentSluggable\ServiceProvider;
 use Dingo\Api\Provider\LaravelServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use VCComponent\Laravel\Order\Providers\OrderServiceProvider;
-use VCComponent\Laravel\Product\Providers\ProductRouteProvider;
 use VCComponent\Laravel\Product\Providers\ProductServiceProvider;
+use VCComponent\Laravel\User\Providers\UserComponentEventProvider;
 use VCComponent\Laravel\User\Providers\UserComponentProvider;
+use VCComponent\Laravel\User\Providers\UserComponentRouteProvider;
 
 class TestCase extends OrchestraTestCase
 {
@@ -24,9 +25,13 @@ class TestCase extends OrchestraTestCase
         return [
             ProductServiceProvider::class,
             OrderServiceProvider::class,
-            UserComponentProvider::class,
             LaravelServiceProvider::class,
             ServiceProvider::class,
+            \Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+            \Illuminate\Auth\AuthServiceProvider::class,
+            UserComponentEventProvider::class,
+            UserComponentProvider::class,
+            UserComponentRouteProvider::class,
         ];
     }
 
@@ -36,8 +41,10 @@ class TestCase extends OrchestraTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
+        $this->loadMigrationsFrom(__DIR__ . '/../src/database/migrations');
         $this->withFactories(__DIR__ . '/../src/database/factories');
+        $this->withFactories(__DIR__ . '/../tests/Stubs/Factory');
+
     }
 
     /**
@@ -52,9 +59,9 @@ class TestCase extends OrchestraTestCase
         $app['config']->set('app.key', 'base64:TEQ1o2POo+3dUuWXamjwGSBx/fsso+viCCg9iFaXNUA=');
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
         $app['config']->set('order.namespace', 'order-management');
         $app['config']->set('order.models', [
@@ -64,43 +71,53 @@ class TestCase extends OrchestraTestCase
             'order' => \VCComponent\Laravel\Order\Transformers\OrderTransformer::class,
         ]);
         $app['config']->set('order.auth_middleware', [
-            'admin'    => [],
-            'frontend' => [],
+            'admin' => [
+                'middleware' => '',
+            ],
+            'frontend' => [
+                'middleware' => '',
+            ],
         ]);
+
+        $app['config']->set('user', ['namespace' => 'user-management']);
+        $app['config']->set('jwt.secret', 'Mxw35fL1E0kQgQB3bmbH1iZnUo1PcJrtQB7j9qUDqbqgHzyz7z0hHfJbC7wWyFgU');
+
+        $app['config']->set('auth.providers.users.model', \VCComponent\Laravel\User\Entities\User::class);
+
         $app['config']->set('order.test_mode', true);
         $app['config']->set('api', [
-            'standardsTree'      => 'x',
-            'subtype'            => '',
-            'version'            => 'v1',
-            'prefix'             => 'api',
-            'domain'             => null,
-            'name'               => null,
+            'standardsTree' => 'x',
+            'subtype' => '',
+            'version' => 'v1',
+            'prefix' => 'api',
+            'domain' => null,
+            'name' => null,
             'conditionalRequest' => true,
-            'strict'             => false,
-            'debug'              => true,
-            'errorFormat'        => [
-                'message'     => ':message',
-                'errors'      => ':errors',
-                'code'        => ':code',
+            'strict' => false,
+            'debug' => true,
+            'errorFormat' => [
+                'message' => ':message',
+                'errors' => ':errors',
+                'code' => ':code',
                 'status_code' => ':status_code',
-                'debug'       => ':debug',
+                'debug' => ':debug',
             ],
-            'middleware'         => [
+            'middleware' => [
             ],
-            'auth'               => [
+            'auth' => [
             ],
-            'throttling'         => [
+            'throttling' => [
             ],
-            'transformer'        => \Dingo\Api\Transformer\Adapter\Fractal::class,
-            'defaultFormat'      => 'json',
-            'formats'            => [
+            'transformer' => \Dingo\Api\Transformer\Adapter\Fractal::class,
+            'defaultFormat' => 'json',
+            'formats' => [
                 'json' => \Dingo\Api\Http\Response\Format\Json::class,
             ],
-            'formatsOptions'     => [
+            'formatsOptions' => [
                 'json' => [
                     'pretty_print' => false,
                     'indent_style' => 'space',
-                    'indent_size'  => 2,
+                    'indent_size' => 2,
                 ],
             ],
         ]);

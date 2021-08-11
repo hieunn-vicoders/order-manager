@@ -6,7 +6,6 @@ use Complex\Exception;
 use Illuminate\Http\Request;
 use VCComponent\Laravel\Order\Entities\OrderItem;
 use VCComponent\Laravel\Order\Repositories\OrderRepository;
-use VCComponent\Laravel\Order\Transformers\OrderItemsTransformer;
 use VCComponent\Laravel\Order\Transformers\OrderTransformer;
 use VCComponent\Laravel\Order\Validators\OrderValidator;
 use VCComponent\Laravel\Product\Entities\Product;
@@ -19,9 +18,9 @@ class OrderController extends ApiController
 
     public function __construct(OrderRepository $repository, OrderValidator $validator)
     {
-        $this->repository  = $repository;
-        $this->entity      = $repository->getEntity();
-        $this->validator   = $validator;
+        $this->repository = $repository;
+        $this->entity = $repository->getEntity();
+        $this->validator = $validator;
         $this->transformer = OrderTransformer::class;
     }
 
@@ -34,7 +33,7 @@ class OrderController extends ApiController
         $query = $this->applyOrderByFromRequest($query, $request);
 
         $per_page = $request->has('per_page') ? (int) $request->get('per_page') : 15;
-        $order    = $query->where('user_id', $id)->paginate($per_page);
+        $order = $query->where('customer_id', $id)->paginate($per_page);
 
         return $this->response->paginator($order, new $this->transformer);
     }
@@ -71,7 +70,7 @@ class OrderController extends ApiController
         if ($request->has('order_items')) {
 
             $product_ids = collect($request->get('order_items'))->pluck('product_id');
-            $products    = Product::whereIn('id', $product_ids)->get();
+            $products = Product::whereIn('id', $product_ids)->get();
 
             $product_exists = array_values(array_diff($product_ids->toArray(), $products->pluck('id')->toArray()));
 
@@ -99,9 +98,9 @@ class OrderController extends ApiController
 
                 $orderItem = OrderItem::where('product_id', $product->id)->where('order_id', $order->id)->first();
 
-                $amount_price     = $product->price;
+                $amount_price = $product->price;
                 $total_attributes = 0;
-                if(isset($value['attributes_value'])) {
+                if (isset($value['attributes_value'])) {
                     $attribute_unique = collect($value['attributes_value'])->unique('attribute_id');
 
                     foreach ($attribute_unique as $attribute_item) {
@@ -109,10 +108,10 @@ class OrderController extends ApiController
                             return $q->id === $attribute_item['value_id'];
                         });
 
-                        if($attribute_chose !== false) {
+                        if ($attribute_chose !== false) {
                             $attributes_exists = $product->attributesValue->get($attribute_chose);
                             if ($attributes_exists->type === 2) {
-                                $total_attr = - $attributes_exists->price;
+                                $total_attr = -$attributes_exists->price;
                             } else if ($attributes_exists->type === 3) {
                                 $total_attr = 0;
                             } else {
@@ -120,7 +119,7 @@ class OrderController extends ApiController
                             }
                             $total_attributes += $total_attr;
                         } else {
-                            throw new \Exception('Thuộc tính có id = '. $attribute_item['value_id'] .' không tồn tại !', 1);
+                            throw new \Exception('Thuộc tính có id = ' . $attribute_item['value_id'] . ' không tồn tại !', 1);
                         }
                     }
                 }
@@ -130,21 +129,21 @@ class OrderController extends ApiController
                 if ($orderItem) {
                     $orderItem->update(['quantity' => $value['quantity']]);
                 } else {
-                    $order_item             = new OrderItem;
-                    $order_item->order_id   = $order->id;
+                    $order_item = new OrderItem;
+                    $order_item->order_id = $order->id;
                     $order_item->product_id = $product->id;
-                    $order_item->price      = $amount_price;
-                    $order_item->quantity   = $value['quantity'];
+                    $order_item->price = $amount_price;
+                    $order_item->quantity = $value['quantity'];
                     $order_item->save();
                 }
 
-                if(isset($value['attributes_value'])) {
+                if (isset($value['attributes_value'])) {
                     $attribute_unique = collect($value['attributes_value'])->unique('attribute_id');
                     foreach ($attribute_unique as $item) {
-                        $attribute_item                = new OrderProductAttribute;
+                        $attribute_item = new OrderProductAttribute;
                         $attribute_item->order_item_id = $order_item->id;
-                        $attribute_item->product_id    = $product->id;
-                        $attribute_item->value_id      = $item['value_id'];
+                        $attribute_item->product_id = $product->id;
+                        $attribute_item->value_id = $item['value_id'];
                         $attribute_item->save();
                     }
                 }
