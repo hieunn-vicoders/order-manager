@@ -15,8 +15,7 @@ class ChangeColumnOrdersTable extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id')->change();
-            $table->foreign('user_id')->references('id')->on('customers')->onDelete('cascade');
-            $table->renameColumn('user_id', 'customer_id');
+            $table->renameColumn('user_id', 'customer_id')->index('customer_id');
         });
 
     }

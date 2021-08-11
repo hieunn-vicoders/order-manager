@@ -44,4 +44,8 @@ class Order extends Model
             'order',
         ];
     }
+    public function ableToUse($user)
+    {
+        return true;
+    }
 }

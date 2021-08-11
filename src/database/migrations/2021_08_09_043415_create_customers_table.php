@@ -16,7 +16,7 @@ class CreateCustomersTable extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('user_id')->unique()->nullable();
-            $table->string('name');
+            $table->string('name')->nullable();
             $table->string('email')->nullable();
             $table->string('phone_number')->nullable();
             $table->bigInteger('order_count')->default(0);
@@ -32,7 +32,6 @@ class CreateCustomersTable extends Migration
      */
     public function down()
     {
-        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('customers');
     }
 }

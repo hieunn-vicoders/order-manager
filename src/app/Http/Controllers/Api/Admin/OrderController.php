@@ -18,27 +18,28 @@ use VCComponent\Laravel\Vicoders\Core\Exceptions\PermissionDeniedException;
 
 class OrderController extends ApiController
 {
-    protected $repositoryOrder;
-    protected $validatorOrder;
+    protected $repository;
+    protected $validator;
 
-    public function __construct(OrderRepository $repositoryOrder, OrderValidator $validatorOrder)
+    public function __construct(OrderRepository $repository, OrderValidator $validator)
     {
-        $this->repositoryOrder = $repositoryOrder;
-        $this->entity = $repositoryOrder->getEntity();
-        $this->validatorOrder = $validatorOrder;
+        $this->repository = $repository;
+        $this->entity = $repository->getEntity();
+        $this->validator = $validator;
         $this->transformer = OrderTransformer::class;
 
-        if (!empty(config('order.auth_middleware.admin'))) {
-            $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToUse($user)) {
-                throw new PermissionDeniedException();
-            }
+        if (empty(config('order.auth_middleware.admin'))) {
+            throw new BadRequestException('order.auth_middleware.admin config should not empty');
+        }
+        $user = $this->getAuthenticatedUser();
+        if (!$this->entity->ableToUse($user)) {
+            throw new PermissionDeniedException();
         }
     }
 
     public function export(Request $request)
     {
-        $this->validatorOrder->isValid($request, 'RULE_EXPORT');
+        $this->validator->isValid($request, 'RULE_EXPORT');
 
         $data = $request->all();
         $orders = $this->getReportOrders($request);
@@ -139,7 +140,7 @@ class OrderController extends ApiController
 
     public function show($id, Request $request)
     {
-        $order = $this->repositoryOrder->findById($id);
+        $order = $this->repository->findById($id);
 
         if ($request->has('includes')) {
             $transformer = new $this->transformer(explode(',', $request->get('includes')));
@@ -152,7 +153,7 @@ class OrderController extends ApiController
 
     public function store(Request $request)
     {
-        $this->validatorOrder->isValid($request, 'RULE_CREATE');
+        $this->validator->isValid($request, 'RULE_CREATE');
 
         $data = $request->all();
 
@@ -164,7 +165,7 @@ class OrderController extends ApiController
             unset($data['includes']);
         }
 
-        $order = $this->repositoryOrder->findWhere($data)->first();
+        $order = $this->repository->findWhere($data)->first();
 
         if ($order) {
             throw new \Exception("Order này đã tồn tại");
@@ -190,7 +191,7 @@ class OrderController extends ApiController
                     throw new \Exception("Sản phẩm {$product->name} không đủ số lượng", 1);
                 }
             }
-            $order = $this->repositoryOrder->create($data);
+            $order = $this->repository->create($data);
 
             $total = 0;
             foreach ($request->get('order_items') as $value) {
@@ -281,9 +282,9 @@ class OrderController extends ApiController
 
     public function update(Request $request, $id)
     {
-        $this->validatorOrder->isValid($request, 'RULE_ADMIN_UPDATE');
+        $this->validator->isValid($request, 'RULE_ADMIN_UPDATE');
 
-        $this->repositoryOrder->findById($id);
+        $this->repository->findById($id);
 
         $data = $request->all();
 
@@ -295,7 +296,7 @@ class OrderController extends ApiController
             unset($data['includes']);
         }
 
-        $order = $this->repositoryOrder->update($data, $id);
+        $order = $this->repository->update($data, $id);
 
         if ($request->has('order_items')) {
 
@@ -377,7 +378,7 @@ class OrderController extends ApiController
 
     public function destroy($id)
     {
-        $order = $this->repositoryOrder->findById($id);
+        $order = $this->repository->findById($id);
 
         if ($order->status_id !== 2 && $order->orderItems->count()) {
             throw new \Exception("Đang có sản phẩm trong giỏ hàng", 1);
@@ -390,22 +391,22 @@ class OrderController extends ApiController
 
     public function updateStatus(Request $request, $id)
     {
-        $this->validatorOrder->isValid($request, 'UPDATE_STATUS_ITEM');
+        $this->validator->isValid($request, 'UPDATE_STATUS_ITEM');
 
-        $this->repositoryOrder->findById($id);
+        $this->repository->findById($id);
 
-        $this->repositoryOrder->updateStatus($request, $id);
+        $this->repository->updateStatus($request, $id);
 
         return $this->success();
     }
 
     public function paymentStatus(Request $request, $id)
     {
-        $this->validatorOrder->isValid($request, 'UPDATE_PAYMENT_STATUS');
+        $this->validator->isValid($request, 'UPDATE_PAYMENT_STATUS');
 
-        $this->repositoryOrder->findById($id);
+        $this->repository->findById($id);
 
-        $this->repositoryOrder->paymentStatus($request, $id);
+        $this->repository->paymentStatus($request, $id);
         return $this->success();
     }
 }
