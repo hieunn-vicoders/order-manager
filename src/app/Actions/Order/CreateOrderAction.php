@@ -5,28 +5,19 @@ namespace VCComponent\Laravel\Order\Actions\Order;
 use VCComponent\Laravel\Order\Actions\Order\CreateOrderItemAction;
 use VCComponent\Laravel\Order\Entities\CartItem;
 use VCComponent\Laravel\Order\Entities\Order;
-use VCComponent\Laravel\Order\Entities\UserOrders;
 
 class CreateOrderAction
 {
     public function __construct(CreateOrderItemAction $createItem, CreateOrderItemAttributesAction $createAttribute)
     {
-        $this->createItem      = $createItem;
+        $this->createItem = $createItem;
         $this->createAttribute = $createAttribute;
     }
 
     public function execute(array $data = [])
     {
 
-        $order    = Order::create($data);
-
-        $order_id = [
-            'order_id' => $order->id,
-        ];
-
-        $user = UserOrders::firstOrCreate($order_id);
-
-        Order::where('id', $order->id)->update(['user_id' => $user->id]);
+        $order = Order::create($data);
 
         $cart_id = $data['cart_id'];
 
@@ -35,9 +26,9 @@ class CreateOrderAction
         foreach ($cart_items as $cart_item) {
             $data = [
                 'product_id' => $cart_item->product_id,
-                'quantity'   => $cart_item->quantity,
-                'price'      => $cart_item->price,
-                'order_id'   => $order->id,
+                'quantity' => $cart_item->quantity,
+                'price' => $cart_item->price,
+                'order_id' => $order->id,
             ];
             $order_item = $this->createItem->excute($data);
 
