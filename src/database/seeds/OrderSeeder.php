@@ -19,15 +19,15 @@ class OrdersSeeder extends Seeder
             $order_date = $date->subDay(rand(1, 365));
             Order::insert([
                 [
-                    "user_id" => "2",
+                    "customer_id" => "2",
                     "total" => rand(1, 10000) * 1000,
                     "phone_number" => "",
                     "username" => "",
                     "address" => "",
                     "payment_method" => 1,
                     "payment_status" => 1,
-                    "status_id" => 1,
-                    "status" => 1,
+                    "status_id" => rand(1, 8),
+                    "status" => 'is_active',
                     "order_date" => $order_date,
                     "created_at" => $order_date,
                     "updated_at" => $order_date
