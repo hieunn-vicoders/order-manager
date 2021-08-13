@@ -6,6 +6,7 @@ use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
 use VCComponent\Laravel\Order\Entities\Order;
 use VCComponent\Laravel\Order\Entities\OrderItem;
+use VCComponent\Laravel\Order\Entities\OrderStatus;
 use VCComponent\Laravel\Order\Repositories\OrderRepository;
 use VCComponent\Laravel\Product\Entities\Product;
 use VCComponent\Laravel\Vicoders\Core\Exceptions\NotFoundException;
@@ -51,8 +52,13 @@ class OrderRepositoryEloquent extends BaseRepository implements OrderRepository
     public function updateStatus($request, $id)
     {
         $updateStatus            = $this->find($id);
-        $updateStatus->status_id = $request->input('status');
+        $status = OrderStatus::where('status_id', $request->input('status_id'))->first();
+        $updateStatus->status_id = $request->input('status_id');
+        if (!$status) {
+            throw new NotFoundException('Order Status');
+        }
         $updateStatus->save();
+
     }
 
     public function paymentStatus($request, $id)

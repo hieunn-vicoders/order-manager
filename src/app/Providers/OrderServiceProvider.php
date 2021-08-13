@@ -19,6 +19,8 @@ use VCComponent\Laravel\Order\Repositories\CartRepository;
 use VCComponent\Laravel\Order\Repositories\CartRepositoryEloquent;
 use VCComponent\Laravel\Order\Repositories\OrderItemRepository;
 use VCComponent\Laravel\Order\Repositories\OrderItemRepositoryEloquent;
+use VCComponent\Laravel\Order\Repositories\OrderStatusRepository;
+use VCComponent\Laravel\Order\Repositories\OrderStatusRepositoryEloquent;
 use VCComponent\Laravel\Order\Repositories\OrderMailRepository;
 use VCComponent\Laravel\Order\Repositories\OrderMailRepositoryEloquent;
 use VCComponent\Laravel\Order\Repositories\OrderRepository;
@@ -32,6 +34,7 @@ class OrderServiceProvider extends ServiceProvider
         $this->app->bind('getCart', GetCart::class);
         $this->app->bind(OrderRepository::class, OrderRepositoryEloquent::class);
         $this->app->bind(OrderItemRepository::class, OrderItemRepositoryEloquent::class);
+        $this->app->bind(OrderStatusRepository::class, OrderStatusRepositoryEloquent::class);
         $this->app->bind(CartItemRepository::class, CartItemRepositoryEloquent::class);
         $this->app->bind(CartRepository::class, CartRepositoryEloquent::class);
         $this->app->bind(OrderMailRepository::class, OrderMailRepositoryEloquent::class);
@@ -53,6 +56,9 @@ class OrderServiceProvider extends ServiceProvider
             __DIR__ . '/../../resources/js/order-info.js' => base_path('/resources/js/order/order-info.js'),
             __DIR__ . '/../../resources/sass/cart.png'    => public_path('/images/cart/cart.png'),
             __DIR__ . '/../../resources/sass/tick.png'    => public_path('/images/cart/tick.png'),
+            __DIR__ . '/../../database/seeds/OrderSeeder.php'  => base_path('/database/seeds/OrderSeeder.php'),
+            __DIR__ . '/../../database/seeds/OrderItemsSeeder.php'  => base_path('/database/seeds/OrderItemsSeeder.php'),
+            __DIR__ . '/../../database/seeds/OrderStatusSeeder.php'  => base_path('/database/seeds/OrderStatusSeeder.php'),
         ]);
 
         View::composer(['order::cartIcon', 'order::cart', 'order::orderInfo'], CartComposer::class);
