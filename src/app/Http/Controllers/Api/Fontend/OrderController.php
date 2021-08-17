@@ -4,6 +4,7 @@ namespace VCComponent\Laravel\Order\Http\Controllers\Api\Fontend;
 
 use Complex\Exception;
 use Illuminate\Http\Request;
+use VCComponent\Laravel\Order\Entities\Customer;
 use VCComponent\Laravel\Order\Entities\OrderItem;
 use VCComponent\Laravel\Order\Repositories\OrderRepository;
 use VCComponent\Laravel\Order\Transformers\OrderTransformer;
@@ -161,6 +162,18 @@ class OrderController extends ApiController
         } else {
             throw new \Exception("Không thể tạo đơn hàng không có sản phẩm nào !", 1);
         }
+        $customer = Customer::updateOrCreate(
+            ['phone_number' => $order->phone_number],
+            [
+                'name' => $order->username,
+                'email' => $order->email,
+            ]
+        );
+        $customer->update([
+            'oder_count' => $customer->order_count++,
+            'total_amount' => $customer->total_amount + $order->total,
+        ]);
+        $this->entity->where('id', $order->id)->update(['customer_id' => $customer->id]);
 
         $this->entity->sendMailOrder($order);
 

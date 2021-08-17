@@ -5,6 +5,7 @@ namespace VCComponent\Laravel\Order\Http\Controllers\Api\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use VCComponent\Laravel\Export\Services\Export\Export;
+use VCComponent\Laravel\Order\Entities\Customer;
 use VCComponent\Laravel\Order\Entities\OrderItem;
 use VCComponent\Laravel\Order\Entities\OrderProductAttribute;
 use VCComponent\Laravel\Order\Events\AddAttributesEvent;
@@ -268,6 +269,18 @@ class OrderController extends ApiController
         } else {
             throw new \Exception("Không thể tạo đơn hàng không có sản phẩm nào !", 1);
         }
+        $customer = Customer::updateOrCreate(
+            ['phone_number' => $order->phone_number],
+            [
+                'name' => $order->username,
+                'email' => $order->email,
+            ]
+        );
+        $customer->update([
+            'oder_count' => $customer->order_count++,
+            'total_amount' => $customer->total_amount + $order->total,
+        ]);
+        $this->entity->where('id', $order->id)->update(['customer_id' => $customer->id]);
 
         $this->entity->sendMailOrder($order);
 
