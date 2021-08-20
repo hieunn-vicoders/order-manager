@@ -27,9 +27,14 @@ class OrderController extends ApiController
         $this->entity = $repository->getEntity();
         $this->validator = $validator;
         $this->transformer = OrderTransformer::class;
-
-        if (empty(config('order.auth_middleware.admin'))) {
-            throw new BadRequestException('order.auth_middleware.admin config should not empty');
+        if (config('order.auth_middleware.admin.middleware') !== '') {
+            $this->middleware(
+                config('order.auth_middleware.admin.middleware'),
+                ['except' => config('order.auth_middleware.admin.middleware.except')]
+            );
+        }
+        else{
+            throw new Exception("Admin middleware configuration is required");
         }
         $user = $this->getAuthenticatedUser();
         if (!$this->entity->ableToUse($user)) {
