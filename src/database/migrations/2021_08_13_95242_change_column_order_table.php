@@ -15,7 +15,7 @@ class ChangeColumnOrderTable extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->string('status')->change();
-            $table->unsignedBigInteger('status_id')->index('status_id')->change();
+            $table->unsignedBigInteger('status_id')->change();
         });
 
     }

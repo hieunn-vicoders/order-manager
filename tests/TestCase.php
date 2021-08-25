@@ -72,7 +72,9 @@ class TestCase extends OrchestraTestCase
         ]);
         $app['config']->set('order.auth_middleware', [
             'admin' => [
-                'middleware' => '',
+                [
+                    'middleware' => '',
+                ],
             ],
             'frontend' => [
                 'middleware' => '',

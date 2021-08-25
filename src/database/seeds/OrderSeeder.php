@@ -1,8 +1,8 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use VCComponent\Laravel\Order\Entities\Order;
-use Carbon\Carbon;
 
 class OrdersSeeder extends Seeder
 {
@@ -30,7 +30,7 @@ class OrdersSeeder extends Seeder
                     "status" => 'is_active',
                     "order_date" => $order_date,
                     "created_at" => $order_date,
-                    "updated_at" => $order_date
+                    "updated_at" => $order_date,
                 ],
             ]);
         }
