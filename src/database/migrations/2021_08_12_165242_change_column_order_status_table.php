@@ -14,11 +14,8 @@ class ChangeColumnOrderStatusTable extends Migration
     public function up()
     {
         Schema::table('order_statuses', function (Blueprint $table) {
-            $table->string('status')->change();
-            $table->unsignedBigInteger('status_id')->after('status')->nullable();
-        });
-        Schema::table('order_statuses', function (Blueprint $table) {
-            $table->unsignedBigInteger('status_id')->index('status_id')->nullable(false)->change();
+            $table->renameColumn('status', 'is_active');
+            $table->unsignedBigInteger('status_id')->after('status')->index('status_id');
         });
 
     }

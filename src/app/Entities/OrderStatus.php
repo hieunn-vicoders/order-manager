@@ -10,6 +10,7 @@ class OrderStatus extends Model
     protected $fillable = [
         'name',
         'slug',
-        'status',
+        'is_active',
+        'status_id'
     ];
 }
