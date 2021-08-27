@@ -7,7 +7,7 @@ $factory->define(OrderStatus::class, function (Faker $faker) {
     return [
         'name' => $faker->words(rand(3, 5), true),
         'name' => 'slug',
-        'status' => 'is_active',
+        'is_active' => 'is_active',
         'status_id' => 1,
     ];
 });
