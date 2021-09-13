@@ -5,6 +5,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Http\Request;
 use VCComponent\Laravel\Mail\Entities\Mail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use VCComponent\Laravel\Export\Services\Export\Export;
 use VCComponent\Laravel\Order\Entities\OrderItem;
 use VCComponent\Laravel\Order\Entities\OrderMail;
@@ -33,7 +34,7 @@ class OrderController extends ApiController
 
         if (!empty(config('order.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToUse($user)) {
+            if (Gate::forUser($user)->denies('manage-order')) {
                 throw new PermissionDeniedException();
             }
         }
