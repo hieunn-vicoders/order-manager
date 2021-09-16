@@ -61,6 +61,9 @@ class OrderController extends ApiController
         if ($request->has('order_items')) {
             unset($data['order_items']);
         }
+        if ($request->has('promo_code')) {
+            unset($data['promo_code']);
+        }
 
         $order = $this->entity->where($data)->first();
 
@@ -156,6 +159,7 @@ class OrderController extends ApiController
                 $calcualator = $amount_price * $value['quantity'];
                 $total += (int) $calcualator;
             }
+            $total = $this->repository->usePromoCode($request, $order, $total);
 
             $order->total = $total;
             $order->save();

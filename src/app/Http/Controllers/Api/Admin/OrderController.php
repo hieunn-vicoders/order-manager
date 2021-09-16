@@ -33,8 +33,7 @@ class OrderController extends ApiController
                 config('order.auth_middleware.admin.middleware'),
                 ['except' => config('order.auth_middleware.admin.middleware.except')]
             );
-        }
-        else{
+        } else {
             throw new Exception("Admin middleware configuration is required");
         }
         $user = $this->getAuthenticatedUser();
@@ -166,6 +165,9 @@ class OrderController extends ApiController
         if ($request->has('order_items')) {
             unset($data['order_items']);
         }
+        if ($request->has('promo_code')) {
+            unset($data['promo_code']);
+        }
 
         if ($request->has('includes')) {
             unset($data['includes']);
@@ -264,6 +266,7 @@ class OrderController extends ApiController
                 $calcualator = $amount_price * $value['quantity'];
                 $total += (int) $calcualator;
             }
+            $total = $this->repository->usePromoCode($request, $order, $total);
 
             $order->total = $total;
             $order->save();

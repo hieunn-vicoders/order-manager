@@ -12,6 +12,7 @@ use VCComponent\Laravel\Order\Entities\Cart;
 use VCComponent\Laravel\Order\Entities\Order;
 use VCComponent\Laravel\Order\Entities\OrderMail;
 use VCComponent\Laravel\Order\Mail\MailNotify;
+use VCComponent\Laravel\Order\Repositories\OrderRepository;
 use VCComponent\Laravel\Order\Traits\Helpers;
 use VCComponent\Laravel\Order\ViewModels\Order\OrderViewModel;
 use VCComponent\Laravel\Payment\Actions\PaymentAction;
@@ -20,16 +21,16 @@ class OrderController extends BaseController implements ViewOrderControllerInter
 {
     use Helpers;
 
-    public function __construct(CreateOrderAction $create_order, PaymentAction $payment)
+    public function __construct(OrderRepository $repository, CreateOrderAction $create_order, PaymentAction $payment)
     {
         if (isset(config('order.viewModels')['order'])) {
             $this->ViewModel = config('order.viewModels.order');
         } else {
             $this->ViewModel = OrderViewModel::class;
         }
+        $this->repository = $repository;
         $this->create_order = $create_order;
         $this->payment = $payment;
-
     }
 
     public function index(Request $request)
@@ -81,13 +82,13 @@ class OrderController extends BaseController implements ViewOrderControllerInter
         } else {
             $order_note = $request->input('note');
         }
-
+        $total = $this->repository->usePromoCodeWeb($request);
         $data = [
             'username' => $request->input('first_name') . " " . $request->input('last_name'),
             'phone_number' => $request->input('phone_number'),
             'email' => $request->input('email'),
             'address' => $request->input('address'),
-            'total' => $request->input('total'),
+            'total' => $total,
             'order_note' => $order_note,
             'payment_method' => $request->input('payment_method'),
             'cart_id' => $request->input('cart_id'),
