@@ -4,6 +4,12 @@ namespace VCComponent\Laravel\Order\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use VCComponent\Laravel\Order\Contracts\OrderItemPolicyInterface;
+use VCComponent\Laravel\Order\Contracts\OrderMailPolicyInterface;
+use VCComponent\Laravel\Order\Contracts\OrderPolicyInterface;
+use VCComponent\Laravel\Order\Entities\Order;
+use VCComponent\Laravel\Order\Entities\OrderItem;
+use VCComponent\Laravel\Order\Entities\OrderMail;
 
 class OrderAuthServiceProvider extends ServiceProvider
 {
@@ -13,7 +19,9 @@ class OrderAuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        //
+        OrderItem::class => OrderItemPolicyInterface::class,
+        OrderMail::class => OrderMailPolicyInterface::class,
+        Order::class     => OrderPolicyInterface::class,
     ];
 
     /**
@@ -24,10 +32,6 @@ class OrderAuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
-        
-        Gate::define('manage-order', 'VCComponent\Laravel\Order\Contracts\OrderPolicyInterface@ableToUse');
-        Gate::define('manage-order-item', 'VCComponent\Laravel\Order\Contracts\OrderItemPolicyInterface@ableToUse');
-        Gate::define('manage-order-mail', 'VCComponent\Laravel\Order\Contracts\OrderMailPolicyInterface@ableToUse');
         //
     }
 }

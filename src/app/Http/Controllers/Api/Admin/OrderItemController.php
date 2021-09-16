@@ -25,7 +25,7 @@ class OrderItemController extends ApiController
 
         if (!empty(config('order.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('manage-order-item')) {
+            if (Gate::forUser($user)->denies('manage', $this->entity)) {
                 throw new PermissionDeniedException();
             }
         }
