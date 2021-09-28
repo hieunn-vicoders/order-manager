@@ -4,6 +4,7 @@ namespace VCComponent\Laravel\Order\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use VCComponent\Laravel\Export\Services\Export\Export;
 use VCComponent\Laravel\Order\Entities\OrderItem;
 use VCComponent\Laravel\Order\Entities\OrderProductAttribute;
@@ -23,17 +24,16 @@ class OrderController extends ApiController
 
     public function __construct(OrderRepository $repository, OrderValidator $validator)
     {
-        $this->repository = $repository;
-        $this->entity = $repository->getEntity();
-        $this->validator = $validator;
-        $this->transformer = OrderTransformer::class;
+        $this->repositoryOrder = $repositoryOrder;
+        $this->entity          = $repositoryOrder->getEntity();
+        $this->validatorOrder  = $validatorOrder;
+        $this->transformer     = OrderTransformer::class;
 
-        if (empty(config('order.auth_middleware.admin'))) {
-            throw new BadRequestException('order.auth_middleware.admin config should not empty');
-        }
-        $user = $this->getAuthenticatedUser();
-        if (!$this->entity->ableToUse($user)) {
-            throw new PermissionDeniedException();
+        if (!empty(config('order.auth_middleware.admin'))) {
+            $user = $this->getAuthenticatedUser();
+            if (Gate::forUser($user)->denies('manage', $this->entity)) {
+                throw new PermissionDeniedException();
+            }
         }
     }
 

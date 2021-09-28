@@ -3,6 +3,7 @@
 namespace VCComponent\Laravel\Order\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use VCComponent\Laravel\Order\Repositories\OrderMailRepository;
 use VCComponent\Laravel\Order\Transformers\OrderMailTransformer;
 use VCComponent\Laravel\Order\Validators\OrderMailValidator;
@@ -21,12 +22,11 @@ class OrderMailController extends ApiController
         $this->validator = $validator;
         $this->transformer = OrderMailTransformer::class;
 
-        if (empty(config('order.auth_middleware.admin'))) {
-            throw new BadRequestException('order.auth_middleware.admin config should not empty');
-        }
-        $user = $this->getAuthenticatedUser();
-        if (!$this->entity->ableToUse($user)) {
-            throw new PermissionDeniedException();
+        if (!empty(config('order.auth_middleware.admin'))) {
+            $user = $this->getAuthenticatedUser();
+            if (Gate::forUser($user)->denies('manage', $this->entity)) {
+                throw new PermissionDeniedException();
+            }
         }
     }
 
