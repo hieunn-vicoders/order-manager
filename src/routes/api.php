@@ -5,6 +5,7 @@ $api->version('v1', function ($api) {
     $api->group(['prefix' => config('order.namespace')], function ($api) {
         $api->group(['prefix' => 'admin'], function ($api) {
             $api->get("/orders/exports", "VCComponent\Laravel\Order\Http\Controllers\Api\Admin\OrderController@export");
+            $api->get('/orders/status', 'VCComponent\Laravel\Order\Http\Controllers\Api\Admin\OrderStatusController@index');
             $api->resource("/orders", "VCComponent\Laravel\Order\Http\Controllers\Api\Admin\OrderController");
             $api->put("/orders/{id}/payment-status", "VCComponent\Laravel\Order\Http\Controllers\Api\Admin\OrderController@paymentStatus");
             $api->put("/orders/{id}/status", "VCComponent\Laravel\Order\Http\Controllers\Api\Admin\OrderController@updateStatus");

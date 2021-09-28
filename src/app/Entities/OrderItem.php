@@ -3,7 +3,6 @@
 namespace VCComponent\Laravel\Order\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use VCComponent\Laravel\Order\Traits\Helpers;
 use VCComponent\Laravel\Product\Entities\Product;
 
 class OrderItem extends Model
@@ -20,5 +19,9 @@ class OrderItem extends Model
     {
         $model_product = config('product.models.product');
         return $this->belongsTo($model_product, 'product_id');
+    }
+    public function ableToUse($user)
+    {
+        return true;
     }
 }

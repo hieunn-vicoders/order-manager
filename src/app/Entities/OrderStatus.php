@@ -4,9 +4,12 @@ namespace VCComponent\Laravel\Order\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserOrders extends Model
+class OrderStatus extends Model
 {
+    protected $table = 'order_statuses';
     protected $fillable = [
-        'order_id',
+        'name',
+        'slug',
+        'status',
     ];
 }

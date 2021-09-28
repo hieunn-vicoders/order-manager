@@ -11,6 +11,7 @@ use VCComponent\Laravel\Order\Transformers\OrderItemTransformer;
 use VCComponent\Laravel\Order\Validators\OrderItemValidator;
 use VCComponent\Laravel\Product\Entities\Product;
 use VCComponent\Laravel\Vicoders\Core\Controllers\ApiController;
+use VCComponent\Laravel\Vicoders\Core\Exceptions\PermissionDeniedException;
 
 class OrderItemController extends ApiController
 {
@@ -18,9 +19,9 @@ class OrderItemController extends ApiController
 
     public function __construct(OrderItemRepository $repository, OrderItemValidator $validator)
     {
-        $this->repository  = $repository;
-        $this->entity      = $repository->getEntity();
-        $this->validator   = $validator;
+        $this->repository = $repository;
+        $this->entity = $repository->getEntity();
+        $this->validator = $validator;
         $this->transformer = OrderItemTransformer::class;
 
         if (!empty(config('order.auth_middleware.admin'))) {
@@ -37,20 +38,20 @@ class OrderItemController extends ApiController
 
         $this->validator->isValid($request, 'RULE_ADMIN_UPDATE');
 
-        $orderItem =  $this->repository->findById($id);
-        $product   = Product::where('id', $orderItem->product_id)->first();
-        $quantity  = $request->get('quantity');
+        $orderItem = $this->repository->findById($id);
+        $product = Product::where('id', $orderItem->product_id)->first();
+        $quantity = $request->get('quantity');
 
         if ($product->quantity < $quantity) {
             throw new \Exception("Sản phẩm {$product->name} không đủ số lượng", 1);
         }
 
-        $origin_quantity     = $product->quantity + $orderItem->quantity;
+        $origin_quantity = $product->quantity + $orderItem->quantity;
         $origin_quantitySold = $product->sold_quantity - $orderItem->quantity;
 
         $orderItem = $this->repository->update(['quantity' => $quantity], $id);
 
-        $product->quantity      = $origin_quantity - $quantity;
+        $product->quantity = $origin_quantity - $quantity;
         $product->sold_quantity = $origin_quantitySold + $quantity;
         $product->save();
 

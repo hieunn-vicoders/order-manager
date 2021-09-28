@@ -17,9 +17,9 @@ class OrderMailController extends ApiController
 
     public function __construct(OrderMailRepository $repository, OrderMailValidator $validator)
     {
-        $this->repository  = $repository;
-        $this->entity      = $repository->getEntity();
-        $this->validator   = $validator;
+        $this->repository = $repository;
+        $this->entity = $repository->getEntity();
+        $this->validator = $validator;
         $this->transformer = OrderMailTransformer::class;
 
         if (!empty(config('order.auth_middleware.admin'))) {
@@ -45,10 +45,10 @@ class OrderMailController extends ApiController
             ]);
 
             $status = explode(',', $request->get('status'));
-            $query  = $query->whereIn('status', $status);
+            $query = $query->whereIn('status', $status);
         }
 
-        $per_page   = $request->has('per_page') ? (int) $request->get('per_page') : 15;
+        $per_page = $request->has('per_page') ? (int) $request->get('per_page') : 15;
         $order_mail = $query->paginate($per_page);
 
         if ($request->has('includes')) {

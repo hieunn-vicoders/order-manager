@@ -16,6 +16,7 @@ class AdminOrderMailsControllerTest extends TestCase
     public function can_get_order_mails_list_by_admin_router()
     {
         $orders = factory(OrderMail::class, 5)->create();
+        $token = $this->loginToken();
 
         $orders = $orders->map(function ($e) {
             unset($e['updated_at']);
@@ -26,7 +27,7 @@ class AdminOrderMailsControllerTest extends TestCase
         $listIds = array_column($orders, 'id');
         array_multisort($listIds, SORT_DESC, $orders);
 
-        $response = $this->call('GET', 'api/order-management/admin/orderMails');
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('GET', 'api/order-management/admin/orderMails');
 
         $response->assertStatus(200);
 
@@ -41,12 +42,13 @@ class AdminOrderMailsControllerTest extends TestCase
     public function can_create_order_mail_by_admin_router()
     {
         $data = factory(OrderMail::class)->make()->toArray();
+        $token = $this->loginToken();
 
-        $response = $this->json('POST', 'api/order-management/admin/orderMails', $data);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('POST', 'api/order-management/admin/orderMails', $data);
 
         $response->assertStatus(200);
         $response->assertJson(['data' => [
-            'email'  => $data['email'],
+            'email' => $data['email'],
             'status' => $data['status'],
         ],
         ]);
@@ -60,6 +62,7 @@ class AdminOrderMailsControllerTest extends TestCase
     public function can_update_order_mails_by_admin_router()
     {
         $data = factory(OrderMail::class)->create()->toArray();
+        $token = $this->loginToken();
 
         unset($data['updated_at']);
         unset($data['created_at']);
@@ -68,11 +71,11 @@ class AdminOrderMailsControllerTest extends TestCase
 
         $email = ['email' => 'udpate@gmail.com'];
 
-        $response = $this->json('PUT', 'api/order-management/admin/orderMails/' . $data['id'], $email);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('PUT', 'api/order-management/admin/orderMails/' . $data['id'], $email);
 
         $response->assertStatus(200);
         $response->assertJson(['data' => [
-            'email'  => $email['email'],
+            'email' => $email['email'],
             'status' => $data['status'],
         ],
         ]);
@@ -84,13 +87,14 @@ class AdminOrderMailsControllerTest extends TestCase
     public function can_delete_order_mail_by_admin_router()
     {
         $order = factory(OrderMail::class)->create()->toArray();
+        $token = $this->loginToken();
 
         unset($order['updated_at']);
         unset($order['created_at']);
 
         $this->assertDatabaseHas('order_mails', $order);
 
-        $response = $this->call('DELETE', 'api/order-management/admin/orderMails/' . $order['id']);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('DELETE', 'api/order-management/admin/orderMails/' . $order['id']);
 
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
@@ -104,12 +108,13 @@ class AdminOrderMailsControllerTest extends TestCase
     public function can_get_order_mail_by_admin_router()
     {
         $order = factory(OrderMail::class)->create();
+        $token = $this->loginToken();
 
-        $response = $this->call('GET', 'api/order-management/admin/orderMails/' . $order->id);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('GET', 'api/order-management/admin/orderMails/' . $order->id);
 
         $response->assertStatus(200);
         $response->assertJson(['data' => [
-            'email'        => $order['email'],
+            'email' => $order['email'],
         ],
         ]);
     }
@@ -120,16 +125,27 @@ class AdminOrderMailsControllerTest extends TestCase
     public function can_update_status_order_mail_by_admin_router()
     {
         $order = factory(OrderMail::class)->make(['status' => 0]);
-        $data  = $order;
+        $data = $order;
         $order->save();
+        $token = $this->loginToken();
 
-        $status   = ['status' => 5];
-        $response = $this->call('PUT', 'api/order-management/admin/orderMails/' . $data->id . '/status', $status);
+        $status = ['status' => 5];
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('PUT', 'api/order-management/admin/orderMails/' . $data->id . '/status', $status);
 
         $response->assertStatus(200);
         $response->assertJson(['success' => 'true']);
 
-        $response = $this->call('GET', 'api/order-management/admin/orderMails/' . $data->id);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('GET', 'api/order-management/admin/orderMails/' . $data->id);
         $response->assertJson(['data' => ['status' => 5]]);
+    }
+
+    protected function loginToken()
+    {
+        $dataLogin = ['username' => 'admin', 'password' => '123456789', 'email' => 'admin@test.com'];
+        $user = factory(\VCComponent\Laravel\User\Entities\User::class)->make($dataLogin);
+        $user->save();
+        $login = $this->json('POST', 'api/user-management/login', $dataLogin);
+        $token = $login->Json()['token'];
+        return $token;
     }
 }

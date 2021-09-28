@@ -12,7 +12,7 @@ class Order extends Model
     use Helpers;
 
     protected $fillable = [
-        'user_id',
+        'customer_id',
         'phone_number',
         'username',
         'email',
@@ -43,5 +43,9 @@ class Order extends Model
         return [
             'order',
         ];
+    }
+    public function ableToUse($user)
+    {
+        return true;
     }
 }
