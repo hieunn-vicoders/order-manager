@@ -4,6 +4,7 @@ namespace VCComponent\Laravel\Order\Http\Controllers\Api\Admin;
 
 use Complex\Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use VCComponent\Laravel\Order\Entities\Order;
 use VCComponent\Laravel\Order\Repositories\OrderItemRepository;
 use VCComponent\Laravel\Order\Transformers\OrderItemTransformer;
@@ -24,7 +25,7 @@ class OrderItemController extends ApiController
 
         if (!empty(config('order.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToUse($user)) {
+            if (Gate::forUser($user)->denies('manage', $this->entity)) {
                 throw new PermissionDeniedException();
             }
         }

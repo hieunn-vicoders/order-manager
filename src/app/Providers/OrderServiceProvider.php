@@ -5,6 +5,10 @@ namespace VCComponent\Laravel\Order\Providers;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use VCComponent\Laravel\Order\Contracts\OrderItemPolicyInterface;
+use VCComponent\Laravel\Order\Contracts\OrderMailPolicyInterface;
+use VCComponent\Laravel\Order\Contracts\OrderPolicyInterface;
+use VCComponent\Laravel\Order\Contracts\OrderStatusPolicyInterface;
 use VCComponent\Laravel\Order\Contracts\ViewCartControllerInterface;
 use VCComponent\Laravel\Order\Contracts\ViewOrderControllerInterface;
 use VCComponent\Laravel\Order\Events\AddAttributesEvent;
@@ -13,6 +17,10 @@ use VCComponent\Laravel\Order\Http\Controllers\Web\Order\OrderController;
 use VCComponent\Laravel\Order\Http\Middleware\CheckCart;
 use VCComponent\Laravel\Order\Http\View\Composers\CartAttributesComposer;
 use VCComponent\Laravel\Order\Http\View\Composers\CartComposer;
+use VCComponent\Laravel\Order\Policies\OrderItemPolicy;
+use VCComponent\Laravel\Order\Policies\OrderMailPolicy;
+use VCComponent\Laravel\Order\Policies\OrderPolicy;
+use VCComponent\Laravel\Order\Policies\OrderStatusPolicy;
 use VCComponent\Laravel\Order\Repositories\CartItemRepository;
 use VCComponent\Laravel\Order\Repositories\CartItemRepositoryEloquent;
 use VCComponent\Laravel\Order\Repositories\CartRepository;
@@ -36,6 +44,9 @@ class OrderServiceProvider extends ServiceProvider
         $this->app->bind(CartRepository::class, CartRepositoryEloquent::class);
         $this->app->bind(OrderMailRepository::class, OrderMailRepositoryEloquent::class);
         $this->registerControllers();
+        $this->registerPolicies();
+
+        $this->app->register(OrderAuthServiceProvider::class);
     }
 
     public function boot(Router $router)
@@ -63,5 +74,12 @@ class OrderServiceProvider extends ServiceProvider
     {
         $this->app->bind(ViewOrderControllerInterface::class, OrderController::class);
         $this->app->bind(ViewCartControllerInterface::class, CartController::class);
+    }
+
+    private function registerPolicies()
+    {
+        $this->app->bind(OrderPolicyInterface::class, OrderPolicy::class);
+        $this->app->bind(OrderItemPolicyInterface::class, OrderItemPolicy::class);
+        $this->app->bind(OrderMailPolicyInterface::class, OrderMailPolicy::class);
     }
 }
