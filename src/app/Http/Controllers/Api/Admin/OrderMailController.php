@@ -3,6 +3,7 @@
 namespace VCComponent\Laravel\Order\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use VCComponent\Laravel\Order\Repositories\OrderMailRepository;
 use VCComponent\Laravel\Order\Transformers\OrderMailTransformer;
 use VCComponent\Laravel\Order\Validators\OrderMailValidator;

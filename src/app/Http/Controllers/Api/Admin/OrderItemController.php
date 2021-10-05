@@ -4,6 +4,7 @@ namespace VCComponent\Laravel\Order\Http\Controllers\Api\Admin;
 
 use Complex\Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use VCComponent\Laravel\Order\Entities\Order;
 use VCComponent\Laravel\Order\Repositories\OrderItemRepository;
 use VCComponent\Laravel\Order\Transformers\OrderItemTransformer;

@@ -4,6 +4,7 @@ namespace VCComponent\Laravel\Order\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use VCComponent\Laravel\Export\Services\Export\Export;
 use VCComponent\Laravel\Order\Entities\OrderItem;
 use VCComponent\Laravel\Order\Entities\OrderProductAttribute;
