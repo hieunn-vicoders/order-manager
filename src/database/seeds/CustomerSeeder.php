@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use VCComponent\Laravel\Order\Entities\Order;
+use VCComponent\Laravel\Order\Entities\Customer;
 
-class OrdersSeeder extends Seeder
+class CustomerSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -12,6 +12,6 @@ class OrdersSeeder extends Seeder
      */
     public function run()
     {
-        factory(Order::class, 1000)->create();
+        factory(Customer::class, 100)->create();
     }
 }

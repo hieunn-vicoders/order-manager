@@ -5,6 +5,7 @@ namespace VCComponent\Laravel\Order\Test\Feature\Order;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use VCComponent\Laravel\Order\Entities\Order;
 use VCComponent\Laravel\Order\Entities\OrderItem;
+use VCComponent\Laravel\Order\Entities\OrderStatus;
 use VCComponent\Laravel\Order\Test\TestCase;
 use VCComponent\Laravel\Product\Entities\Product;
 
@@ -165,20 +166,22 @@ class AdminOrderControllerTest extends TestCase
      */
     public function can_change_status_order_by_admin_router()
     {
-        $order = factory(Order::class)->make(['status' => 0]);
+        factory(OrderStatus::class)->create(['slug' => 'pending', 'status_id' => 1]);
+        factory(OrderStatus::class)->create(['slug' => 'approved', 'status_id' => 2]);
+
+        $order = factory(Order::class)->make(['status_id' => 1]);
         $token = $this->loginToken();
 
         $data = $order;
         $order->save();
 
-        $status = ['status' => 5];
+        $status = ['status_id' => 2];
         $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('PUT', 'api/order-management/admin/orders/' . $data->id . '/status', $status);
-
         $response->assertStatus(200);
         $response->assertJson(['success' => 'true']);
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('GET', 'api/order-management/admin/orders/' . $data->id);
-        $response->assertJson(['data' => ['status_id' => 5]]);
+        $response->assertJson(['data' => ['status_id' => 2]]);
     }
 
     /**

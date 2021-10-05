@@ -28,6 +28,18 @@ class Cart extends Model
     {
         return $this->cartItems->sum('amount');
     }
+    public function discount($promo_code)
+    {
+        if ($promo_code->getPromoType() === 1) {
+            return $promo_code->getPromoValue();
+        } elseif ($promo_code->promo_type === 2) {
+            return $this->calculateTotal() * (($promo_code->getPromoValue()) / 100);
+        }
+    }
+    public function getTotal($promo_code)
+    {
+        return $this->calculateTotal() - $this->discount($promo_code);
+    }
 
     public function cartTypes()
     {

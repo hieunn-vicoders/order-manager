@@ -1,12 +1,10 @@
 {
     "name": "webpress/order-manager",
     "description": "",
-    "authors": [
-        {
-            "name": "huybq",
-            "email": "quanghuyhg007@gmail.com"
-        }
-    ],
+    "authors": [{
+        "name": "huybq",
+        "email": "quanghuyhg007@gmail.com"
+    }],
     "autoload": {
         "classmap": ["src/app/"],
         "psr-4": {
