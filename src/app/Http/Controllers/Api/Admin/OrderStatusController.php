@@ -18,7 +18,15 @@ class OrderStatusController extends ApiController
         $this->repository  = $repository;
         $this->entity      = $repository->getEntity();
         $this->transformer = OrderStatusTransformer::class;
-
+        if (config('order.auth_middleware.admin.middleware') !== '') {
+            $this->middleware(
+                config('order.auth_middleware.admin.middleware'),
+                ['except' => config('order.auth_middleware.admin.middleware.except')]
+            );
+        }
+        else{
+            throw new Exception("Admin middleware configuration is required");
+        }
     }
 
     public function index()

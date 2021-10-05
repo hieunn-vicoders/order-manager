@@ -24,11 +24,18 @@ class OrderItemController extends ApiController
         $this->validator = $validator;
         $this->transformer = OrderItemTransformer::class;
 
-        if (!empty(config('order.auth_middleware.admin'))) {
-            $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('manage', $this->entity)) {
-                throw new PermissionDeniedException();
-            }
+        if (config('order.auth_middleware.admin.middleware') !== '') {
+            $this->middleware(
+                config('order.auth_middleware.admin.middleware'),
+                ['except' => config('order.auth_middleware.admin.middleware.except')]
+            );
+        }
+        else{
+            throw new Exception("Admin middleware configuration is required");
+        }
+        $user = $this->getAuthenticatedUser();
+        if (!$this->entity->ableToUse($user)) {
+            throw new PermissionDeniedException();
         }
 
     }
