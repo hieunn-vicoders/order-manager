@@ -70,9 +70,12 @@ class TestCase extends OrchestraTestCase
         $app['config']->set('order.transformers', [
             'order' => \VCComponent\Laravel\Order\Transformers\OrderTransformer::class,
         ]);
+        $app['config']->set('repository.cache.enabled', false);
         $app['config']->set('order.auth_middleware', [
             'admin' => [
-                'middleware' => '',
+                [
+                    'middleware' => '',
+                ],
             ],
             'frontend' => [
                 'middleware' => '',

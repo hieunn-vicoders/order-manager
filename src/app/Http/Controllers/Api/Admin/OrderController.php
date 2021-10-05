@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use VCComponent\Laravel\Export\Services\Export\Export;
+use VCComponent\Laravel\Order\Entities\Customer;
 use VCComponent\Laravel\Order\Entities\OrderItem;
 use VCComponent\Laravel\Order\Entities\OrderProductAttribute;
 use VCComponent\Laravel\Order\Events\AddAttributesEvent;
@@ -24,16 +25,21 @@ class OrderController extends ApiController
 
     public function __construct(OrderRepository $repository, OrderValidator $validator)
     {
-        $this->repositoryOrder = $repositoryOrder;
-        $this->entity          = $repositoryOrder->getEntity();
-        $this->validatorOrder  = $validatorOrder;
-        $this->transformer     = OrderTransformer::class;
-
-        if (!empty(config('order.auth_middleware.admin'))) {
-            $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('manage', $this->entity)) {
-                throw new PermissionDeniedException();
-            }
+        $this->repository = $repository;
+        $this->entity = $repository->getEntity();
+        $this->validator = $validator;
+        $this->transformer = OrderTransformer::class;
+        if (config('order.auth_middleware.admin.middleware') !== '') {
+            $this->middleware(
+                config('order.auth_middleware.admin.middleware'),
+                ['except' => config('order.auth_middleware.admin.middleware.except')]
+            );
+        } else {
+            throw new Exception("Admin middleware configuration is required");
+        }
+        $user = $this->getAuthenticatedUser();
+        if (!$this->entity->ableToUse($user)) {
+            throw new PermissionDeniedException();
         }
     }
 
@@ -160,6 +166,9 @@ class OrderController extends ApiController
         if ($request->has('order_items')) {
             unset($data['order_items']);
         }
+        if ($request->has('promo_code')) {
+            unset($data['promo_code']);
+        }
 
         if ($request->has('includes')) {
             unset($data['includes']);
@@ -258,6 +267,7 @@ class OrderController extends ApiController
                 $calcualator = $amount_price * $value['quantity'];
                 $total += (int) $calcualator;
             }
+            $total = $this->repository->usePromoCode($request, $order, $total);
 
             $order->total = $total;
             $order->save();
@@ -268,6 +278,18 @@ class OrderController extends ApiController
         } else {
             throw new \Exception("Không thể tạo đơn hàng không có sản phẩm nào !", 1);
         }
+        $customer = Customer::updateOrCreate(
+            ['phone_number' => $order->phone_number],
+            [
+                'name' => $order->username,
+                'email' => $order->email,
+            ]
+        );
+        $customer->update([
+            'oder_count' => $customer->order_count++,
+            'total_amount' => $customer->total_amount + $order->total,
+        ]);
+        $this->entity->where('id', $order->id)->update(['customer_id' => $customer->id]);
 
         $this->entity->sendMailOrder($order);
 

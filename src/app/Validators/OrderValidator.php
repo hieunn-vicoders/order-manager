@@ -9,31 +9,22 @@ class OrderValidator extends AbstractValidator
 {
     protected $rules = [
         ValidatorInterface::RULE_ADMIN_CREATE => [
-            'customer_id' => ['required'],
             'email' => ['bail', 'required', 'email'],
             'username' => ['required'],
             'phone_number' => ['required'],
             'address' => ['required'],
-            'order_note' => ['required'],
-            'payment_method' => ['required'],
         ],
         ValidatorInterface::RULE_ADMIN_UPDATE => [
-            'customer_id' => ['required'],
             'email' => ['bail', 'required', 'email'],
             'username' => ['required'],
             'phone_number' => ['required'],
             'address' => ['required'],
-            'order_note' => ['required'],
-            'payment_method' => ['required'],
         ],
         ValidatorInterface::RULE_CREATE => [
-            'customer_id' => ['required'],
             'email' => ['bail', 'required', 'email'],
             'username' => ['required'],
             'phone_number' => ['required'],
             'address' => ['required'],
-            'order_note' => ['required'],
-            'payment_method' => ['required'],
         ],
         ValidatorInterface::UPDATE_STATUS_ITEM => [
             'status_id' => ['required'],

@@ -73,9 +73,7 @@ class FrontendOrderControllerTest extends TestCase
     public function can_get_order_by_front_end_router()
     {
         $order = factory(Order::class)->create();
-
         $response = $this->call('GET', 'api/order-management/orders/' . $order->id);
-
         $response->assertStatus(200);
         $response->assertJson(['data' => [
             'customer_id' => $order['customer_id'],

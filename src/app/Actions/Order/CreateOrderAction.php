@@ -4,6 +4,7 @@ namespace VCComponent\Laravel\Order\Actions\Order;
 
 use VCComponent\Laravel\Order\Actions\Order\CreateOrderItemAction;
 use VCComponent\Laravel\Order\Entities\CartItem;
+use VCComponent\Laravel\Order\Entities\Customer;
 use VCComponent\Laravel\Order\Entities\Order;
 
 class CreateOrderAction
@@ -18,6 +19,19 @@ class CreateOrderAction
     {
 
         $order = Order::create($data);
+
+        $customer = Customer::updateOrCreate(
+            ['phone_number' => $order->phone_number],
+            [
+                'name' => $order->username,
+                'email' => $order->email,
+            ]
+        );
+        $customer->update([
+            'oder_count' => $customer->order_count++,
+            'total_amount' => $customer->total_amount + $order->total,
+        ]);
+        Order::where('id', $order->id)->update(['customer_id' => $customer->id]);
 
         $cart_id = $data['cart_id'];
 

@@ -4,6 +4,7 @@ namespace VCComponent\Laravel\Order\Http\Controllers\Api\Fontend;
 
 use Complex\Exception;
 use Illuminate\Http\Request;
+use VCComponent\Laravel\Order\Entities\Customer;
 use VCComponent\Laravel\Order\Entities\OrderItem;
 use VCComponent\Laravel\Order\Repositories\OrderRepository;
 use VCComponent\Laravel\Order\Transformers\OrderTransformer;
@@ -59,6 +60,9 @@ class OrderController extends ApiController
 
         if ($request->has('order_items')) {
             unset($data['order_items']);
+        }
+        if ($request->has('promo_code')) {
+            unset($data['promo_code']);
         }
 
         $order = $this->entity->where($data)->first();
@@ -155,12 +159,25 @@ class OrderController extends ApiController
                 $calcualator = $amount_price * $value['quantity'];
                 $total += (int) $calcualator;
             }
+            $total = $this->repository->usePromoCode($request, $order, $total);
 
             $order->total = $total;
             $order->save();
         } else {
             throw new \Exception("Không thể tạo đơn hàng không có sản phẩm nào !", 1);
         }
+        $customer = Customer::updateOrCreate(
+            ['phone_number' => $order->phone_number],
+            [
+                'name' => $order->username,
+                'email' => $order->email,
+            ]
+        );
+        $customer->update([
+            'oder_count' => $customer->order_count++,
+            'total_amount' => $customer->total_amount + $order->total,
+        ]);
+        $this->entity->where('id', $order->id)->update(['customer_id' => $customer->id]);
 
         $this->entity->sendMailOrder($order);
 
