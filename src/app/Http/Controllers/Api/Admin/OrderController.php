@@ -401,13 +401,7 @@ class OrderController extends ApiController
     public function destroy($id)
     {
         $order = $this->repository->findById($id);
-
-        if ($order->status_id !== 2 && $order->orderItems->count()) {
-            throw new \Exception("Đang có sản phẩm trong giỏ hàng", 1);
-        }
-
         $order->delete();
-
         return $this->success();
     }
 
