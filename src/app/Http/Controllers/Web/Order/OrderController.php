@@ -103,10 +103,10 @@ class OrderController extends BaseController implements ViewOrderControllerInter
 
         $this->sendMailOrder($order);
 
-        if ($request['payment_method'] !== 1) {
+        if ($request['payment_method'] != 1) {
             return $this->payment->excute($order);
         } else {
-            return view('order::orderAlert');
+            return view($this->viewAlert());
         }
     }
 
@@ -121,7 +121,7 @@ class OrderController extends BaseController implements ViewOrderControllerInter
         $order = Order::where('cart_id', $payment_response->cart_id)->first();
 
         if (!$order) {
-            return view('order::orderAlert')->with('alert', "Lỗi không tìm thấy đơn hàng ! Xin vui lòng thử lại !");
+            return view($this->viewAlert())->with('alert', "Lỗi không tìm thấy đơn hàng ! Xin vui lòng thử lại !");
         }
 
         $messages = '';
@@ -134,7 +134,7 @@ class OrderController extends BaseController implements ViewOrderControllerInter
 
         Cart::where('uuid', $payment_response->cart_id)->delete();
 
-        return view('order::orderAlert');
+        return view($this->viewAlert());
     }
 
     public function sendMailOrder($order)
@@ -146,5 +146,10 @@ class OrderController extends BaseController implements ViewOrderControllerInter
         }
 
         return $order;
+    }
+
+    public function viewAlert() 
+    {
+        return 'order::orderAlert';
     }
 }
