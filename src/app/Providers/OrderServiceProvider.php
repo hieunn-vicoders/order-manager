@@ -34,6 +34,10 @@ use VCComponent\Laravel\Order\Repositories\OrderMailRepositoryEloquent;
 use VCComponent\Laravel\Order\Repositories\OrderRepository;
 use VCComponent\Laravel\Order\Repositories\OrderRepositoryEloquent;
 use VCComponent\Laravel\Order\Services\GetCart;
+use VCComponent\Laravel\Order\Validators\OrderItemValidator;
+use VCComponent\Laravel\Order\Validators\OrderItemValidatorInterface;
+use VCComponent\Laravel\Order\Validators\OrderValidator;
+use VCComponent\Laravel\Order\Validators\OrderValidatorInterface;
 
 class OrderServiceProvider extends ServiceProvider
 {
@@ -48,6 +52,7 @@ class OrderServiceProvider extends ServiceProvider
         $this->app->bind(OrderMailRepository::class, OrderMailRepositoryEloquent::class);
         $this->registerControllers();
         $this->registerPolicies();
+        $this->registerValidators();
 
         $this->app->register(OrderAuthServiceProvider::class);
     }
@@ -87,5 +92,11 @@ class OrderServiceProvider extends ServiceProvider
         $this->app->bind(OrderPolicyInterface::class, OrderPolicy::class);
         $this->app->bind(OrderItemPolicyInterface::class, OrderItemPolicy::class);
         $this->app->bind(OrderMailPolicyInterface::class, OrderMailPolicy::class);
+    }
+
+    private function registerValidators()
+    {
+        $this->app->bind(OrderValidatorInterface::class, OrderValidator::class);
+        $this->app->bind(OrderItemValidatorInterface::class, OrderItemValidator::class);
     }
 }

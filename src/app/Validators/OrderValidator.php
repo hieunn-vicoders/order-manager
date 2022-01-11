@@ -5,7 +5,7 @@ namespace VCComponent\Laravel\Order\Validators;
 use VCComponent\Laravel\Vicoders\Core\Validators\AbstractValidator;
 use VCComponent\Laravel\Vicoders\Core\Validators\ValidatorInterface;
 
-class OrderValidator extends AbstractValidator
+class OrderValidator extends AbstractValidator implements OrderValidatorInterface
 {
     protected $rules = [
         ValidatorInterface::RULE_ADMIN_CREATE => [
