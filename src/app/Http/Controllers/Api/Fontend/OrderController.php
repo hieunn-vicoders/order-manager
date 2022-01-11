@@ -8,7 +8,7 @@ use VCComponent\Laravel\Order\Entities\Customer;
 use VCComponent\Laravel\Order\Entities\OrderItem;
 use VCComponent\Laravel\Order\Repositories\OrderRepository;
 use VCComponent\Laravel\Order\Transformers\OrderTransformer;
-use VCComponent\Laravel\Order\Validators\OrderValidator;
+use VCComponent\Laravel\Order\Validators\OrderValidatorInterface;
 use VCComponent\Laravel\Product\Entities\Product;
 use VCComponent\Laravel\Vicoders\Core\Controllers\ApiController;
 
@@ -17,12 +17,17 @@ class OrderController extends ApiController
     protected $repository;
     protected $validator;
 
-    public function __construct(OrderRepository $repository, OrderValidator $validator)
+    public function __construct(OrderRepository $repository, OrderValidatorInterface $validator)
     {
         $this->repository = $repository;
         $this->entity = $repository->getEntity();
         $this->validator = $validator;
-        $this->transformer = OrderTransformer::class;
+
+        if (isset(config('order.transformers')['order'])) {
+            $this->transformer = config('order.transformers.order');
+        } else {
+            $this->transformer = OrderTransformer::class;
+        }
     }
 
     public function index(Request $request, $id)

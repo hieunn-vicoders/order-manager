@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Gate;
 use VCComponent\Laravel\Order\Entities\Order;
 use VCComponent\Laravel\Order\Repositories\OrderItemRepository;
 use VCComponent\Laravel\Order\Transformers\OrderItemTransformer;
-use VCComponent\Laravel\Order\Validators\OrderItemValidator;
+use VCComponent\Laravel\Order\Validators\OrderItemValidatorInterface;
 use VCComponent\Laravel\Product\Entities\Product;
 use VCComponent\Laravel\Vicoders\Core\Controllers\ApiController;
 use VCComponent\Laravel\Vicoders\Core\Exceptions\PermissionDeniedException;
@@ -17,12 +17,17 @@ class OrderItemController extends ApiController
 {
     protected $repository;
 
-    public function __construct(OrderItemRepository $repository, OrderItemValidator $validator)
+    public function __construct(OrderItemRepository $repository, OrderItemValidatorInterface $validator)
     {
         $this->repository = $repository;
         $this->entity = $repository->getEntity();
         $this->validator = $validator;
-        $this->transformer = OrderItemTransformer::class;
+
+        if (isset(config('order.transformers')['order_item'])) {
+            $this->transformer = config('order.transformers.order_item');
+        } else {
+            $this->transformer = OrderItemTransformer::class;
+        }
 
         if (config('order.auth_middleware.admin.middleware') !== '') {
             $this->middleware(
@@ -33,6 +38,7 @@ class OrderItemController extends ApiController
         else{
             throw new Exception("Admin middleware configuration is required");
         }
+
         $user = $this->getAuthenticatedUser();
         if (!$this->entity->ableToUse($user)) {
             throw new PermissionDeniedException();
