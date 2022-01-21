@@ -20,7 +20,11 @@ class OrderStatusRepositoryEloquent extends BaseRepository implements OrderStatu
      */
     public function model()
     {
-        return OrderStatus::class;
+        if (isset(config('order.models')['order'])) {
+            return config('order.models.order-status');
+        } else {
+            return OrderStatus::class;
+        }
     }
 
     public function getEntity()
