@@ -10,7 +10,7 @@ Route::prefix(config('order.namespace'))->middleware('web')->group(function () {
 
     Route::get('/order-info', 'VCComponent\Laravel\Order\Contracts\ViewOrderControllerInterface@index');
 
-    Route::post('/order-create', 'VCComponent\Laravel\Order\Http\Controllers\Web\Order\OrderController@create')->name('order.create');
+    Route::post('/order-create', 'VCComponent\Laravel\Order\Contracts\ViewOrderControllerInterface@create')->name('order.create');
 
-    Route::get('/payment-response', 'VCComponent\Laravel\Order\Http\Controllers\Web\Order\OrderController@paymentResponse');
+    Route::get('/payment-response', 'VCComponent\Laravel\Order\Contracts\ViewOrderControllerInterface@paymentResponse');
 });

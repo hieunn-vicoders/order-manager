@@ -106,6 +106,7 @@ class OrderController extends BaseController implements ViewOrderControllerInter
         if ($request['payment_method'] != 1) {
             return $this->payment->excute($order);
         } else {
+            Cart::where('uuid', $request->input('cart_id'))->delete();
             return view($this->viewAlert());
         }
     }

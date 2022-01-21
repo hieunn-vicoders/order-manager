@@ -26,7 +26,7 @@ class OrderRepositoryEloquent extends BaseRepository implements OrderRepository
         if (isset(config('order.models')['order'])) {
             return config('order.models.order');
         } else {
-            return Post::class;
+            return Order::class;
         }
     }
 
