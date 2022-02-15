@@ -20,7 +20,7 @@ class OrderItemRepositoryEloquent extends BaseRepository implements OrderItemRep
      */
     public function model()
     {
-        if (isset(config('order.models')['order'])) {
+        if (isset(config('order.models')['order-item'])) {
             return config('order.models.order-item');
         } else {
             return OrderMail::class;

@@ -19,7 +19,7 @@ class CartItemRepositoryEloquent extends BaseRepository implements CartItemRepos
      */
     public function model()
     {
-        if (isset(config('order.models')['order'])) {
+        if (isset(config('order.models')['cartItem'])) {
             return config('order.models.cartItem');
         } else {
             return CartItem::class;
