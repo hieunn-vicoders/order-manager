@@ -92,6 +92,7 @@ class OrderController extends BaseController implements ViewOrderControllerInter
             'order_note' => $order_note,
             'payment_method' => $request->input('payment_method'),
             'cart_id' => $request->input('cart_id'),
+            'order_date' => now(),
         ];
 
         if ($request->has(['district', 'provine'])) {
