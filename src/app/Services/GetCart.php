@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Cookie;
 
 class GetCart
 {
+    protected $entity;
     protected $data = [
         'cart'    => null,
         'fetched' => false,
@@ -13,8 +14,13 @@ class GetCart
 
     public function __construct()
     {
+        if (config('order.models.cart')) {
+            $this->entity = config('order.models.cart');
+        } else {
+            $this->entity = \VCComponent\Laravel\Order\Entities\Cart::class;
+        }
         if (Cookie::has('cart')) {
-            $cart       = \VCComponent\Laravel\Order\Entities\Cart::where('uuid', Cookie::get('cart'))->with('cartItems')->first();
+            $cart       = $this->entity::where('uuid', Cookie::get('cart'))->with('cartItems')->first();
             $this->data = ([
                 'cart'    => $cart,
                 'fetched' => true,
@@ -36,7 +42,7 @@ class GetCart
         $cart = [];
         if ($this->data['fetched'] === false) {
             if (Cookie::has('cart')) {
-                $cart = \VCComponent\Laravel\Order\Entities\Cart::where('uuid', Cookie::get('cart'))->with('cartItems')->first();
+                $cart = $this->entity::where('uuid', Cookie::get('cart'))->with('cartItems')->first();
             }
         }
         $this->data = ([
