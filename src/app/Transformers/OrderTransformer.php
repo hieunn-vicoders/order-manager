@@ -10,6 +10,7 @@ class OrderTransformer extends TransformerAbstract
 {
     protected $availableIncludes = [
         'orderItems',
+        'order_items'
     ];
 
     public function __construct($includes = [])
