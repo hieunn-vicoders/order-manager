@@ -365,7 +365,7 @@ class OrderController extends ApiController
                 }
             }
 
-            $orderitems->delete();
+            $orderitems->whereIn('product_id', '<>', collect($request->get('order_items'))->pluck('product_id')->toArray())->delete();
 
             $total = 0;
 
@@ -374,12 +374,10 @@ class OrderController extends ApiController
                     return $item->id == $value['product_id'];
                 });
 
-                $order_item = new OrderItem;
-                $order_item->order_id = $order->id;
-                $order_item->product_id = $product->id;
-                $order_item->price = $product->price;
-                $order_item->quantity = $value['quantity'];
-                $order_item->save();
+                $order_item = OrderItem::updateOrCreate(
+                    ['order_id' => $order->id, 'product_id' => $product->id],
+                    ['price' => $product->price, 'quantity' => $value['quantity']]
+                );
 
                 foreach ($items_old as $item) {
                     if ($item['product_id'] == $product->id) {
