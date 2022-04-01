@@ -342,7 +342,7 @@ class OrderController extends ApiController
                 }
             }
 
-            $orderitems = OrderItem::where('order_id', $order->id);
+            $orderitems = $order->orderItems();
             $items = $orderitems->get();
 
             $items_old = [];
@@ -365,7 +365,9 @@ class OrderController extends ApiController
                 }
             }
 
-            $orderitems->whereIn('product_id', '<>', collect($request->get('order_items'))->pluck('product_id')->toArray())->delete();
+            $orderitems->whereNotIn('product_id', collect($request->get('order_items'))->pluck('product_id')->toArray())->each(function ($order_item) {
+                $order_item->delete();
+            });
 
             $total = 0;
 
